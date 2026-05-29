@@ -28,7 +28,7 @@ export class ScenarioRepository extends Repository<ScenarioComparison> {
   protected override deserialize(raw: unknown): ScenarioComparison {
     const dto = raw as ScenarioDTO;
     if (!dto || typeof dto.id !== 'string' || !Array.isArray(dto.calculationIds)) {
-      throw new Error('ScenarioComparison: невалиден JSON.');
+      throw new Error('ScenarioComparison: invalid JSON.');
     }
     return new ScenarioComparison(
       dto.id,
