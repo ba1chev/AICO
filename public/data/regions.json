@@ -1,0 +1,82 @@
+[
+  {
+    "id": "bg",
+    "name": "България",
+    "countryCode": "BG",
+    "carbonIntensityGCO2PerKWh": 360,
+    "wueLitersPerKWh": 1.8,
+    "defaultPUE": 1.4
+  },
+  {
+    "id": "de",
+    "name": "Германия",
+    "countryCode": "DE",
+    "carbonIntensityGCO2PerKWh": 380,
+    "wueLitersPerKWh": 1.7,
+    "defaultPUE": 1.35
+  },
+  {
+    "id": "fr",
+    "name": "Франция",
+    "countryCode": "FR",
+    "carbonIntensityGCO2PerKWh": 60,
+    "wueLitersPerKWh": 1.5,
+    "defaultPUE": 1.3
+  },
+  {
+    "id": "se",
+    "name": "Швеция",
+    "countryCode": "SE",
+    "carbonIntensityGCO2PerKWh": 30,
+    "wueLitersPerKWh": 0.9,
+    "defaultPUE": 1.15
+  },
+  {
+    "id": "is",
+    "name": "Исландия",
+    "countryCode": "IS",
+    "carbonIntensityGCO2PerKWh": 20,
+    "wueLitersPerKWh": 0.5,
+    "defaultPUE": 1.1
+  },
+  {
+    "id": "pl",
+    "name": "Полша",
+    "countryCode": "PL",
+    "carbonIntensityGCO2PerKWh": 720,
+    "wueLitersPerKWh": 2.1,
+    "defaultPUE": 1.5
+  },
+  {
+    "id": "us-east",
+    "name": "САЩ — Източно крайбрежие",
+    "countryCode": "US",
+    "carbonIntensityGCO2PerKWh": 380,
+    "wueLitersPerKWh": 1.8,
+    "defaultPUE": 1.4
+  },
+  {
+    "id": "us-west",
+    "name": "САЩ — Западно крайбрежие",
+    "countryCode": "US",
+    "carbonIntensityGCO2PerKWh": 240,
+    "wueLitersPerKWh": 1.6,
+    "defaultPUE": 1.35
+  },
+  {
+    "id": "in",
+    "name": "Индия",
+    "countryCode": "IN",
+    "carbonIntensityGCO2PerKWh": 710,
+    "wueLitersPerKWh": 2.5,
+    "defaultPUE": 1.6
+  },
+  {
+    "id": "cn",
+    "name": "Китай",
+    "countryCode": "CN",
+    "carbonIntensityGCO2PerKWh": 580,
+    "wueLitersPerKWh": 2.0,
+    "defaultPUE": 1.5
+  }
+]
