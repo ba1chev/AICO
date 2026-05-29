@@ -25,7 +25,7 @@ export class Session {
   static fromJSON(raw: unknown): Session {
     const dto = raw as Partial<SessionDTO>;
     if (!dto?.userId || !dto.role || !dto.issuedAt || !dto.expiresAt) {
-      throw new Error('Session: невалиден JSON.');
+      throw new Error('Session: invalid JSON.');
     }
     return new Session(dto.userId, dto.role, new Date(dto.issuedAt), new Date(dto.expiresAt));
   }
