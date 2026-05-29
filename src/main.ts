@@ -32,6 +32,8 @@ import { AuthGuard, GuestOnlyGuard } from '@domains/auth/guards/AuthGuards';
 import { ScenarioRepository } from '@domains/scenarios/repository/ScenarioRepository';
 import { ScenarioComparisonService } from '@domains/scenarios/services/ScenarioComparisonService';
 
+import { ReportsService } from '@domains/reports/services/ReportsService';
+
 async function bootstrap(): Promise<void> {
   const host = document.getElementById('app');
   if (!host) throw new Error('Missing #app element in index.html');
@@ -79,6 +81,11 @@ async function bootstrap(): Promise<void> {
         c.resolve(TOKENS.ScenarioRepository),
         c.resolve(TOKENS.CalculationRepository),
       ),
+  );
+
+  container.registerSingleton(
+    TOKENS.Reports,
+    (c) => new ReportsService(c.resolve(TOKENS.CalculationRepository)),
   );
 
   await i18n.load('bg').catch((err) => {
@@ -139,6 +146,12 @@ async function bootstrap(): Promise<void> {
       view: () => import('./domains/scenarios/views/CompareView'),
       guards: [authGuard()],
       title: 'Сравнение',
+    })
+    .register({
+      path: '/reports',
+      view: () => import('./domains/reports/views/ReportsView'),
+      guards: [authGuard()],
+      title: 'Отчети',
     })
     .registerNotFound(NotFoundView);
 
