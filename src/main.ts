@@ -33,7 +33,7 @@ import { ScenarioComparisonService } from '@domains/scenarios/services/ScenarioC
 
 async function bootstrap(): Promise<void> {
   const host = document.getElementById('app');
-  if (!host) throw new Error('Липсва #app в index.html');
+  if (!host) throw new Error('Missing #app element in index.html');
 
   const container = new Container();
   const bus = new EventBus();
@@ -81,7 +81,7 @@ async function bootstrap(): Promise<void> {
   );
 
   await i18n.load('bg').catch((err) => {
-    console.warn('[bootstrap] i18n не успя да зареди:', err);
+    console.warn('[bootstrap] i18n failed to load:', err);
   });
 
   await seedAdminIfMissing(container.resolve(TOKENS.Users), container.resolve(TOKENS.PasswordHasher));
