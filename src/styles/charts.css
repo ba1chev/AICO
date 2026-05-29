@@ -1,0 +1,60 @@
+.chart {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+.chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font-body, system-ui), sans-serif;
+}
+
+.chart__label,
+.chart__value,
+.chart__axis text,
+.chart__axis-label,
+.chart__empty {
+  fill: var(--color-text, #1a1a1a);
+  font-size: 12px;
+}
+
+.chart__value {
+  font-weight: var(--fw-semibold, 600);
+}
+
+.chart__axis path,
+.chart__axis line {
+  stroke: var(--color-border, #d0d0d0);
+  shape-rendering: crispEdges;
+}
+
+.chart__axis--x text,
+.chart__axis--y text {
+  fill: var(--color-text-muted, #555);
+}
+
+.chart__bar,
+.chart__slice {
+  transition: opacity 120ms ease;
+}
+
+.chart__bar:hover,
+.chart__slice:hover {
+  opacity: 0.85;
+}
+
+.chart__line {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart__point {
+  cursor: default;
+}
+
+.chart__empty {
+  fill: var(--color-text-muted, #555);
+  font-style: italic;
+}
