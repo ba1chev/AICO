@@ -16,21 +16,21 @@ const base = {
 };
 
 describe('CalculationParams.create', () => {
-  it('приема валидни входни данни', () => {
+  it('accepts valid input', () => {
     expect(() => CalculationParams.create(base)).not.toThrow();
   });
 
-  it('отхвърля durationHours <= 0', () => {
+  it('rejects durationHours <= 0', () => {
     try {
       CalculationParams.create({ ...base, durationHours: 0 });
-      expect.fail('трябваше да хвърли');
+      expect.fail('expected to throw');
     } catch (e) {
       expect(e).toBeInstanceOf(ValidationError);
       expect((e as ValidationError).hasField('durationHours')).toBe(true);
     }
   });
 
-  it('отхвърля PUE < 1', () => {
+  it('rejects PUE < 1', () => {
     try {
       CalculationParams.create({ ...base, pue: 0.5 });
       expect.fail();
@@ -39,7 +39,7 @@ describe('CalculationParams.create', () => {
     }
   });
 
-  it('отхвърля utilization > 1', () => {
+  it('rejects utilization > 1', () => {
     try {
       CalculationParams.create({ ...base, utilization: 1.5 });
       expect.fail();
@@ -48,7 +48,7 @@ describe('CalculationParams.create', () => {
     }
   });
 
-  it('събира всички грешки наведнъж', () => {
+  it('collects all errors at once', () => {
     try {
       CalculationParams.create({ ...base, durationHours: -1, pue: 5, utilization: 0 });
       expect.fail();

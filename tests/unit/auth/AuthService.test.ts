@@ -26,10 +26,10 @@ describe('AuthService', () => {
     env = makeAuth();
   });
 
-  it('register създава developer и стартира session', async () => {
+  it('register creates a developer and starts a session', async () => {
     const user = await env.auth.register({
       email: 'Dev@Example.com',
-      displayName: 'Дев',
+      displayName: 'Dev',
       password: 'parola123',
       passwordConfirm: 'parola123',
       role: 'developer',
@@ -40,32 +40,32 @@ describe('AuthService', () => {
     expect(env.sessions.load()).not.toBeNull();
   });
 
-  it('register с researcher запазва affiliation', async () => {
+  it('register with researcher persists affiliation', async () => {
     const user = await env.auth.register({
       email: 'r@x.bg',
-      displayName: 'Рая',
+      displayName: 'Raya',
       password: 'parola123',
       passwordConfirm: 'parola123',
       role: 'researcher',
-      affiliation: 'ФМИ',
+      affiliation: 'FMI',
     });
     expect(user).toBeInstanceOf(Researcher);
-    expect((user as Researcher).affiliation).toBe('ФМИ');
+    expect((user as Researcher).affiliation).toBe('FMI');
   });
 
-  it('register отхвърля несъвпадащи пароли', async () => {
+  it('register rejects mismatched passwords', async () => {
     await expect(
       env.auth.register({
         email: 'a@b.bg',
-        displayName: 'Алекс',
+        displayName: 'Alex',
         password: 'parola123',
-        passwordConfirm: 'друго123',
+        passwordConfirm: 'drugo123',
         role: 'developer',
       }),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it('register отхвърля къса парола и невалиден имейл наведнъж', async () => {
+  it('register rejects short password and invalid email at once', async () => {
     try {
       await env.auth.register({
         email: 'invalid',
@@ -74,7 +74,7 @@ describe('AuthService', () => {
         passwordConfirm: '12',
         role: 'developer',
       });
-      expect.fail('трябваше да хвърли');
+      expect.fail('expected to throw');
     } catch (e) {
       const err = e as ValidationError;
       expect(err.errors.length).toBeGreaterThanOrEqual(3);
@@ -83,10 +83,10 @@ describe('AuthService', () => {
     }
   });
 
-  it('register отхвърля дублиран имейл', async () => {
+  it('register rejects duplicate email', async () => {
     await env.auth.register({
       email: 'dup@x.bg',
-      displayName: 'Първи',
+      displayName: 'First',
       password: 'parola123',
       passwordConfirm: 'parola123',
       role: 'developer',
@@ -95,7 +95,7 @@ describe('AuthService', () => {
     await expect(
       env.auth.register({
         email: 'DUP@x.bg',
-        displayName: 'Втори',
+        displayName: 'Second',
         password: 'parola123',
         passwordConfirm: 'parola123',
         role: 'developer',
@@ -103,10 +103,10 @@ describe('AuthService', () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it('login успява с правилни данни', async () => {
+  it('login succeeds with correct credentials', async () => {
     await env.auth.register({
       email: 'a@b.bg',
-      displayName: 'Алекс',
+      displayName: 'Alex',
       password: 'parola123',
       passwordConfirm: 'parola123',
       role: 'developer',
@@ -117,10 +117,10 @@ describe('AuthService', () => {
     expect(env.auth.current().isAuthenticated()).toBe(true);
   });
 
-  it('login отхвърля грешна парола с DomainError', async () => {
+  it('login rejects wrong password with DomainError', async () => {
     await env.auth.register({
       email: 'a@b.bg',
-      displayName: 'Алекс',
+      displayName: 'Alex',
       password: 'parola123',
       passwordConfirm: 'parola123',
       role: 'developer',
@@ -129,10 +129,10 @@ describe('AuthService', () => {
     await expect(env.auth.login('a@b.bg', 'wrong')).rejects.toBeInstanceOf(DomainError);
   });
 
-  it('logout връща current на Guest', async () => {
+  it('logout returns current to Guest', async () => {
     await env.auth.register({
       email: 'a@b.bg',
-      displayName: 'Алекс',
+      displayName: 'Alex',
       password: 'parola123',
       passwordConfirm: 'parola123',
       role: 'developer',
@@ -142,10 +142,10 @@ describe('AuthService', () => {
     expect(env.sessions.load()).toBeNull();
   });
 
-  it('restore възстановява потребителя от session-а', async () => {
+  it('restore brings the user back from session', async () => {
     await env.auth.register({
       email: 'a@b.bg',
-      displayName: 'Алекс',
+      displayName: 'Alex',
       password: 'parola123',
       passwordConfirm: 'parola123',
       role: 'developer',

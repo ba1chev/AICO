@@ -22,7 +22,7 @@ describe('StandardCalculationEngine', () => {
     defaultPUE: 1.2,
   });
 
-  it('изчислява acceptance стойността от плана: 1× A100 × 10h × PUE 1.2 в BG', () => {
+  it('matches the plan acceptance value: 1x A100 x 10h x PUE 1.2 in BG', () => {
     const params = CalculationParams.create({
       hardware: a100,
       region: bg,
@@ -40,7 +40,7 @@ describe('StandardCalculationEngine', () => {
     expect(result.waterLiters).toBeCloseTo(8.64, 6);
   });
 
-  it('скалира линейно с броя хардуер', () => {
+  it('scales linearly with hardware count', () => {
     const single = CalculationParams.create({
       hardware: a100,
       region: bg,
@@ -64,7 +64,7 @@ describe('StandardCalculationEngine', () => {
     expect(engine.compute(quad).energyKWh).toBeCloseTo(engine.compute(single).energyKWh * 4, 6);
   });
 
-  it('utilization намалява енергията пропорционално', () => {
+  it('utilization scales energy proportionally', () => {
     const full = CalculationParams.create({
       hardware: a100,
       region: bg,

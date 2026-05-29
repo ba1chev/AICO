@@ -45,55 +45,55 @@ describe('ScenarioComparisonService', () => {
     env = makeService();
   });
 
-  it('create запазва сценарий с уникални ids', () => {
-    const s = env.service.create('Тест', 'u1', ['c1', 'c2', 'c1']);
+  it('create stores a scenario with unique ids', () => {
+    const s = env.service.create('Test', 'u1', ['c1', 'c2', 'c1']);
     expect(s.calculationIds).toEqual(['c1', 'c2']);
     expect(env.scenarios.findById(s.id)).not.toBeNull();
   });
 
-  it('create отхвърля повече от MAX', () => {
-    expect(() => env.service.create('Тест', 'u1', ['c1', 'c2', 'c3', 'c4'])).toThrow(DomainError);
+  it('create rejects more than MAX', () => {
+    expect(() => env.service.create('Test', 'u1', ['c1', 'c2', 'c3', 'c4'])).toThrow(DomainError);
   });
 
-  it('addCalculation спазва лимита', () => {
-    const s = env.service.create('Тест', 'u1', ['c1', 'c2', 'c3']);
+  it('addCalculation respects the limit', () => {
+    const s = env.service.create('Test', 'u1', ['c1', 'c2', 'c3']);
     expect(() => env.service.addCalculation(s.id, 'c4')).toThrow(DomainError);
   });
 
-  it('addCalculation е идемпотентно', () => {
-    const s = env.service.create('Тест', 'u1', ['c1']);
+  it('addCalculation is idempotent', () => {
+    const s = env.service.create('Test', 'u1', ['c1']);
     const after = env.service.addCalculation(s.id, 'c1');
     expect(after.calculationIds).toEqual(['c1']);
   });
 
-  it('removeCalculation премахва id', () => {
-    const s = env.service.create('Тест', 'u1', ['c1', 'c2']);
+  it('removeCalculation drops the id', () => {
+    const s = env.service.create('Test', 'u1', ['c1', 'c2']);
     const after = env.service.removeCalculation(s.id, 'c1');
     expect(after.calculationIds).toEqual(['c2']);
   });
 
-  it('rename запазва ново име', () => {
-    const s = env.service.create('Старо', 'u1', []);
-    const after = env.service.rename(s.id, 'Ново');
-    expect(after.name).toBe('Ново');
+  it('rename persists the new name', () => {
+    const s = env.service.create('Old', 'u1', []);
+    const after = env.service.rename(s.id, 'New');
+    expect(after.name).toBe('New');
   });
 
-  it('populate връща калкулациите по ids', () => {
-    const s = env.service.create('Тест', 'u1', ['c1', 'c2']);
+  it('populate returns the calculations by ids', () => {
+    const s = env.service.create('Test', 'u1', ['c1', 'c2']);
     const populated = env.service.populate(s);
     expect(populated.calculations).toHaveLength(2);
     expect(populated.calculations.map((c) => c.id).sort()).toEqual(['c1', 'c2']);
   });
 
-  it('populate пропуска липсващи калкулации', () => {
-    const s = env.service.create('Тест', 'u1', ['c1', 'missing']);
+  it('populate skips missing calculations', () => {
+    const s = env.service.create('Test', 'u1', ['c1', 'missing']);
     const populated = env.service.populate(s);
     expect(populated.calculations.map((c) => c.id)).toEqual(['c1']);
   });
 
-  it('listForUser филтрира по userId', () => {
-    env.service.create('Мое', 'u1', []);
-    env.service.create('Чуждо', 'u2', []);
+  it('listForUser filters by userId', () => {
+    env.service.create('Mine', 'u1', []);
+    env.service.create('Other', 'u2', []);
     expect(env.service.listForUser('u1')).toHaveLength(1);
     expect(env.service.listForUser('u2')).toHaveLength(1);
   });

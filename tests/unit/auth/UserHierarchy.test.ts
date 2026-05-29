@@ -10,7 +10,7 @@ const creds: UserCredentials = { passwordHash: 'h', passwordSalt: 's', iteration
 const date = new Date('2026-01-01');
 
 describe('User hierarchy — canAccess', () => {
-  it('Guest има достъп само до калкулатора', () => {
+  it('Guest can only access the calculator', () => {
     const g = new Guest();
     expect(g.canAccess('calculator')).toBe(true);
     expect(g.canAccess('history')).toBe(false);
@@ -18,8 +18,8 @@ describe('User hierarchy — canAccess', () => {
     expect(g.isAuthenticated()).toBe(false);
   });
 
-  it('Developer има достъп до history/compare/reports, но не до dashboard и admin', () => {
-    const d = new Developer('1', 'a@b.bg', 'Алекс', date, creds);
+  it('Developer can access history/compare/reports, but not dashboard or admin', () => {
+    const d = new Developer('1', 'a@b.bg', 'Alex', date, creds);
     expect(d.canAccess('history')).toBe(true);
     expect(d.canAccess('reports')).toBe(true);
     expect(d.canAccess('dashboard')).toBe(false);
@@ -27,23 +27,23 @@ describe('User hierarchy — canAccess', () => {
     expect(d.isAuthenticated()).toBe(true);
   });
 
-  it('Researcher наследява Developer и добавя dashboard', () => {
-    const r = new Researcher('2', 'r@b.bg', 'Рая', date, creds, 'ФМИ СУ');
+  it('Researcher inherits from Developer and adds dashboard', () => {
+    const r = new Researcher('2', 'r@b.bg', 'Raya', date, creds, 'FMI SU');
     expect(r).toBeInstanceOf(Developer);
     expect(r.canAccess('history')).toBe(true);
     expect(r.canAccess('dashboard')).toBe(true);
     expect(r.canAccess('admin')).toBe(false);
   });
 
-  it('Organization има достъп до dashboard и reports', () => {
-    const o = new Organization('3', 'o@b.bg', 'Орг', date, creds, 'ACME');
+  it('Organization can access dashboard and reports', () => {
+    const o = new Organization('3', 'o@b.bg', 'Org', date, creds, 'ACME');
     expect(o.canAccess('dashboard')).toBe(true);
     expect(o.canAccess('reports')).toBe(true);
     expect(o.canAccess('admin')).toBe(false);
   });
 
-  it('Admin има достъп до всичко', () => {
-    const a = new Admin('4', 'admin@b.bg', 'Админ', date, creds);
+  it('Admin can access everything', () => {
+    const a = new Admin('4', 'admin@b.bg', 'Admin', date, creds);
     expect(a.canAccess('admin')).toBe(true);
     expect(a.canAccess('admin.users')).toBe(true);
     expect(a.canAccess('admin.hardware')).toBe(true);
