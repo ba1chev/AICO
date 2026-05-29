@@ -147,7 +147,10 @@ export class CalculatorView extends View {
 
       const engine = this.container.resolve(TOKENS.CalculationEngine);
       const result = engine.compute(params);
-      const calc = new Calculation(generateId(), params, result, new Date(), null, null);
+      const auth = this.container.resolve(TOKENS.Auth);
+      const user = auth.current();
+      const userId = user.isAuthenticated() ? user.id : null;
+      const calc = new Calculation(generateId(), params, result, new Date(), userId, null);
 
       const repo = this.container.resolve(TOKENS.CalculationRepository);
       repo.save(calc);
