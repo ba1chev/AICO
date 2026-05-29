@@ -3,6 +3,7 @@ import './styles/reset.css';
 import './styles/base.css';
 import './styles/layout.css';
 import './styles/a11y.css';
+import './styles/charts.css';
 
 import { App } from './App';
 import { Container } from '@core/di/Container';
