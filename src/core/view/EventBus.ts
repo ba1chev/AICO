@@ -25,7 +25,7 @@ export class EventBus {
       try {
         l(payload);
       } catch (err) {
-        console.error(`[EventBus] Грешка в слушател за "${event}":`, err);
+        console.error(`[EventBus] Listener for "${event}" threw:`, err);
       }
     }
   }
