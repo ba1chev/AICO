@@ -9,6 +9,12 @@ import type { RegionCatalog } from '@domains/calculator/services/RegionCatalog';
 import type { CalculationEngine } from '@domains/calculator/services/CalculationEngine';
 import type { CalculationRepository } from '@domains/calculator/repository/CalculationRepository';
 
+import type { AuthService } from '@domains/auth/services/AuthService';
+import type { UserRepository } from '@domains/auth/repository/UserRepository';
+import type { IPasswordHasher } from '@domains/auth/services/IPasswordHasher';
+import type { SessionManager } from '@domains/auth/services/SessionManager';
+import type { OAuthProviderStub } from '@domains/auth/services/OAuthProviderStub';
+
 export const TOKENS = {
   EventBus: createToken<EventBus>('EventBus'),
   Storage: createToken<IStorage>('Storage'),
@@ -19,4 +25,10 @@ export const TOKENS = {
   RegionCatalog: createToken<RegionCatalog>('RegionCatalog'),
   CalculationEngine: createToken<CalculationEngine>('CalculationEngine'),
   CalculationRepository: createToken<CalculationRepository>('CalculationRepository'),
+
+  Auth: createToken<AuthService>('AuthService'),
+  Users: createToken<UserRepository>('UserRepository'),
+  PasswordHasher: createToken<IPasswordHasher>('PasswordHasher'),
+  SessionManager: createToken<SessionManager>('SessionManager'),
+  OAuth: createToken<OAuthProviderStub>('OAuthProviderStub'),
 } as const;
