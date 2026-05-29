@@ -22,7 +22,7 @@ export abstract class View {
       try {
         dispose();
       } catch (err) {
-        console.error('[View] Грешка при освобождаване:', err);
+        console.error('[View] Disposer threw:', err);
       }
     }
     this.disposers.length = 0;
@@ -57,7 +57,7 @@ export abstract class View {
 
   protected $<E extends HTMLElement = HTMLElement>(selector: string): E {
     const el = this.root.querySelector<E>(selector);
-    if (!el) throw new Error(`[View] Елемент "${selector}" не е намерен в ${this.constructor.name}`);
+    if (!el) throw new Error(`[View] Element "${selector}" not found in ${this.constructor.name}`);
     return el;
   }
 
