@@ -1,0 +1,29 @@
+{
+  "app.title": "AICO",
+  "nav.home": "Начало",
+  "nav.calculator": "Калкулатор",
+  "nav.history": "История",
+  "nav.compare": "Сравнение",
+  "nav.reports": "Отчети",
+  "nav.dashboard": "Табло",
+  "nav.login": "Вход",
+  "nav.register": "Регистрация",
+
+  "calculator.title": "Калкулатор за екологичен отпечатък",
+  "calculator.hardware": "Хардуер",
+  "calculator.region": "Регион",
+  "calculator.duration": "Продължителност (часове)",
+  "calculator.pue": "PUE (енергийна ефективност на дейтацентъра)",
+  "calculator.utilization": "Натоварване (0–1)",
+  "calculator.workload": "Тип натоварване",
+  "calculator.submit": "Изчисли",
+
+  "result.title": "Резултат",
+  "result.energy": "Енергия (kWh)",
+  "result.co2": "Емисии CO₂e (kg)",
+  "result.water": "Вода (литри)",
+
+  "common.loading": "Зареждане…",
+  "common.error": "Възникна грешка",
+  "common.back": "Назад"
+}
