@@ -28,6 +28,9 @@ import { OAuthProviderStub } from '@domains/auth/services/OAuthProviderStub';
 import { seedAdminIfMissing } from '@domains/auth/services/seedAdmin';
 import { AuthGuard, GuestOnlyGuard } from '@domains/auth/guards/AuthGuards';
 
+import { ScenarioRepository } from '@domains/scenarios/repository/ScenarioRepository';
+import { ScenarioComparisonService } from '@domains/scenarios/services/ScenarioComparisonService';
+
 async function bootstrap(): Promise<void> {
   const host = document.getElementById('app');
   if (!host) throw new Error('Липсва #app в index.html');
@@ -61,6 +64,19 @@ async function bootstrap(): Promise<void> {
         c.resolve(TOKENS.PasswordHasher),
         c.resolve(TOKENS.SessionManager),
         c.resolve(TOKENS.EventBus),
+      ),
+  );
+
+  container.registerSingleton(
+    TOKENS.ScenarioRepository,
+    (c) => new ScenarioRepository(c.resolve(TOKENS.Storage)),
+  );
+  container.registerSingleton(
+    TOKENS.ScenarioComparison,
+    (c) =>
+      new ScenarioComparisonService(
+        c.resolve(TOKENS.ScenarioRepository),
+        c.resolve(TOKENS.CalculationRepository),
       ),
   );
 
@@ -110,6 +126,18 @@ async function bootstrap(): Promise<void> {
       view: () => import('./domains/auth/views/ProfileView'),
       guards: [authGuard()],
       title: 'Профил',
+    })
+    .register({
+      path: '/history',
+      view: () => import('./domains/history/views/HistoryView'),
+      guards: [authGuard()],
+      title: 'История',
+    })
+    .register({
+      path: '/compare',
+      view: () => import('./domains/scenarios/views/CompareView'),
+      guards: [authGuard()],
+      title: 'Сравнение',
     })
     .registerNotFound(NotFoundView);
 
