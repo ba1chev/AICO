@@ -13,6 +13,7 @@ export abstract class User implements Identifiable {
     public readonly email: string,
     public readonly displayName: string,
     public readonly createdAt: Date,
+    public readonly active: boolean = true,
   ) {}
 
   abstract get role(): Role;

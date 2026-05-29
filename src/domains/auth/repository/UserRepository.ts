@@ -17,6 +17,7 @@ interface UserDTO {
   credentials: UserCredentials;
   affiliation?: string | null;
   organizationName?: string;
+  active?: boolean;
 }
 
 export class UserRepository extends Repository<User> {
@@ -34,12 +35,16 @@ export class UserRepository extends Repository<User> {
   }
 
   protected override serialize(entity: User): UserDTO {
+    const base = {
+      id: entity.id,
+      email: entity.email,
+      displayName: entity.displayName,
+      createdAt: entity.createdAt.toISOString(),
+      active: entity.active,
+    };
     if (entity instanceof Researcher) {
       return {
-        id: entity.id,
-        email: entity.email,
-        displayName: entity.displayName,
-        createdAt: entity.createdAt.toISOString(),
+        ...base,
         role: 'researcher',
         credentials: entity.credentials,
         affiliation: entity.affiliation,
@@ -47,20 +52,14 @@ export class UserRepository extends Repository<User> {
     }
     if (entity instanceof Developer) {
       return {
-        id: entity.id,
-        email: entity.email,
-        displayName: entity.displayName,
-        createdAt: entity.createdAt.toISOString(),
+        ...base,
         role: 'developer',
         credentials: entity.credentials,
       };
     }
     if (entity instanceof Organization) {
       return {
-        id: entity.id,
-        email: entity.email,
-        displayName: entity.displayName,
-        createdAt: entity.createdAt.toISOString(),
+        ...base,
         role: 'organization',
         credentials: entity.credentials,
         organizationName: entity.organizationName,
@@ -68,10 +67,7 @@ export class UserRepository extends Repository<User> {
     }
     if (entity instanceof Admin) {
       return {
-        id: entity.id,
-        email: entity.email,
-        displayName: entity.displayName,
-        createdAt: entity.createdAt.toISOString(),
+        ...base,
         role: 'admin',
         credentials: entity.credentials,
       };
@@ -82,6 +78,7 @@ export class UserRepository extends Repository<User> {
   protected override deserialize(raw: unknown): User {
     const dto = raw as UserDTO;
     const created = new Date(dto.createdAt);
+    const active = dto.active ?? true;
     switch (dto.role) {
       case 'researcher':
         return new Researcher(
@@ -91,9 +88,10 @@ export class UserRepository extends Repository<User> {
           created,
           dto.credentials,
           dto.affiliation ?? null,
+          active,
         );
       case 'developer':
-        return new Developer(dto.id, dto.email, dto.displayName, created, dto.credentials);
+        return new Developer(dto.id, dto.email, dto.displayName, created, dto.credentials, active);
       case 'organization':
         return new Organization(
           dto.id,
@@ -102,9 +100,10 @@ export class UserRepository extends Repository<User> {
           created,
           dto.credentials,
           dto.organizationName ?? '',
+          active,
         );
       case 'admin':
-        return new Admin(dto.id, dto.email, dto.displayName, created, dto.credentials);
+        return new Admin(dto.id, dto.email, dto.displayName, created, dto.credentials, active);
       default:
         throw ValidationError.of('role', `Invalid role in storage: ${(dto as UserDTO).role}`);
     }

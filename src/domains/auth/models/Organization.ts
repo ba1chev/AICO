@@ -9,8 +9,9 @@ export class Organization extends User {
     createdAt: Date,
     public readonly credentials: UserCredentials,
     public readonly organizationName: string,
+    active: boolean = true,
   ) {
-    super(id, email, displayName, createdAt);
+    super(id, email, displayName, createdAt, active);
   }
 
   override get role(): Role {

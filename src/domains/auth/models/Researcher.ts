@@ -10,8 +10,9 @@ export class Researcher extends Developer {
     createdAt: Date,
     credentials: UserCredentials,
     public readonly affiliation: string | null,
+    active: boolean = true,
   ) {
-    super(id, email, displayName, createdAt, credentials);
+    super(id, email, displayName, createdAt, credentials, active);
   }
 
   override get role(): Role {

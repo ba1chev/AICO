@@ -8,8 +8,9 @@ export class Developer extends User {
     displayName: string,
     createdAt: Date,
     public readonly credentials: UserCredentials,
+    active: boolean = true,
   ) {
-    super(id, email, displayName, createdAt);
+    super(id, email, displayName, createdAt, active);
   }
 
   override get role(): Role {
