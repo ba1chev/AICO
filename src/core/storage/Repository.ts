@@ -22,7 +22,7 @@ export abstract class Repository<T extends Identifiable> {
       try {
         out.push(this.deserialize(r));
       } catch (err) {
-        console.warn(`[Repository:${this.storageKey}] Пропускаме повреден запис:`, err);
+        console.warn(`[Repository:${this.storageKey}] Skipping corrupt record:`, err);
       }
     }
     return out;
