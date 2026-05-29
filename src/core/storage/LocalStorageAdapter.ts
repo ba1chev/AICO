@@ -17,7 +17,7 @@ export class LocalStorageAdapter implements IStorage {
     try {
       return JSON.parse(raw) as T;
     } catch {
-      console.warn(`[LocalStorageAdapter] Невалиден JSON за "${key}". Изтриваме.`);
+      console.warn(`[LocalStorageAdapter] Invalid JSON for "${key}". Removing.`);
       this.remove(key);
       return null;
     }
@@ -27,7 +27,7 @@ export class LocalStorageAdapter implements IStorage {
     try {
       localStorage.setItem(this.k(key), JSON.stringify(value));
     } catch (err) {
-      console.error(`[LocalStorageAdapter] Не можа да се запише "${key}":`, err);
+      console.error(`[LocalStorageAdapter] Failed to write "${key}":`, err);
     }
   }
 
