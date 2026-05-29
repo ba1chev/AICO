@@ -1,0 +1,74 @@
+[
+  {
+    "id": "nvidia-a100-400",
+    "name": "A100 (40GB)",
+    "vendor": "NVIDIA",
+    "category": "gpu",
+    "powerWatts": 400,
+    "description": "Data center GPU за AI обучение"
+  },
+  {
+    "id": "nvidia-h100-700",
+    "name": "H100 SXM",
+    "vendor": "NVIDIA",
+    "category": "gpu",
+    "powerWatts": 700,
+    "description": "Hopper поколение, за големи модели"
+  },
+  {
+    "id": "nvidia-v100-300",
+    "name": "V100 (32GB)",
+    "vendor": "NVIDIA",
+    "category": "gpu",
+    "powerWatts": 300,
+    "description": "Volta поколение, по-старо обучение"
+  },
+  {
+    "id": "nvidia-t4-70",
+    "name": "T4",
+    "vendor": "NVIDIA",
+    "category": "gpu",
+    "powerWatts": 70,
+    "description": "Енергоефективен GPU за инференс"
+  },
+  {
+    "id": "nvidia-rtx4090-450",
+    "name": "RTX 4090",
+    "vendor": "NVIDIA",
+    "category": "gpu",
+    "powerWatts": 450,
+    "description": "Consumer GPU, често използван за изследване"
+  },
+  {
+    "id": "google-tpu-v4-200",
+    "name": "TPU v4",
+    "vendor": "Google",
+    "category": "tpu",
+    "powerWatts": 200,
+    "description": "Google специализиран AI ускорител"
+  },
+  {
+    "id": "google-tpu-v5e-170",
+    "name": "TPU v5e",
+    "vendor": "Google",
+    "category": "tpu",
+    "powerWatts": 170,
+    "description": "Енергоефективен TPU"
+  },
+  {
+    "id": "intel-xeon-platinum-270",
+    "name": "Xeon Platinum 8480+",
+    "vendor": "Intel",
+    "category": "cpu",
+    "powerWatts": 270,
+    "description": "Server CPU, за CPU-based натоварвания"
+  },
+  {
+    "id": "amd-epyc-9654-360",
+    "name": "EPYC 9654",
+    "vendor": "AMD",
+    "category": "cpu",
+    "powerWatts": 360,
+    "description": "Server CPU с висока паралелност"
+  }
+]
