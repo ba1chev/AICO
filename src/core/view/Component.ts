@@ -11,7 +11,7 @@ export abstract class Component {
 
   mount(host: HTMLElement): void {
     if (this.mounted) {
-      console.warn(`[Component] ${this.constructor.name} вече е mount-нат — пропускаме.`);
+      console.warn(`[Component] ${this.constructor.name} is already mounted — skipping.`);
       return;
     }
     this.root = host;
@@ -30,7 +30,7 @@ export abstract class Component {
       try {
         dispose();
       } catch (err) {
-        console.error('[Component] Грешка при освобождаване:', err);
+        console.error('[Component] Disposer threw:', err);
       }
     }
     this.disposers.length = 0;
