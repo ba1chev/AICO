@@ -25,17 +25,17 @@ export class Hardware {
 
   static fromJSON(raw: unknown): Hardware {
     if (typeof raw !== 'object' || raw === null) {
-      throw ValidationError.of('hardware', 'Невалиден hardware запис.');
+      throw ValidationError.of('hardware', 'Invalid hardware record.');
     }
     const o = raw as Partial<HardwareJSON>;
     if (!o.id || !o.name || !o.vendor || !o.category || typeof o.powerWatts !== 'number') {
-      throw ValidationError.of('hardware', 'Hardware: липсват задължителни полета.');
+      throw ValidationError.of('hardware', 'Hardware: missing required fields.');
     }
     if (o.powerWatts <= 0) {
-      throw ValidationError.of('powerWatts', 'Hardware: powerWatts трябва да е > 0.');
+      throw ValidationError.of('powerWatts', 'Hardware: powerWatts must be > 0.');
     }
     if (!['gpu', 'tpu', 'cpu'].includes(o.category)) {
-      throw ValidationError.of('category', `Hardware: непозната категория "${o.category}".`);
+      throw ValidationError.of('category', `Hardware: unknown category "${o.category}".`);
     }
     return new Hardware(o.id, o.name, o.vendor, o.category, o.powerWatts, o.description);
   }
