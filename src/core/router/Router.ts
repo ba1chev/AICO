@@ -84,7 +84,7 @@ export class Router {
 
       this.bus.emit('router:navigated', { path, params: match.params });
     } catch (err) {
-      console.error('[Router] Грешка при resolve:', err);
+      console.error('[Router] resolve failed:', err);
       this.bus.emit('router:error', { path, error: err });
       this.outlet.innerHTML = `<div class="error-banner" role="alert">
         <h2>Възникна грешка</h2>
