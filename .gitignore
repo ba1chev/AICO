@@ -28,3 +28,4 @@ coverage/
 # Env
 .env
 .env.local
+todo.txt
