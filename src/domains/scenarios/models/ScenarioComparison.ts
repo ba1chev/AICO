@@ -18,7 +18,7 @@ export class ScenarioComparison implements Identifiable {
   withCalculation(calculationId: string): ScenarioComparison {
     if (this.calculationIds.includes(calculationId)) return this;
     if (this.calculationIds.length >= MAX_SCENARIOS) {
-      throw new Error(`Не може да добавите повече от ${MAX_SCENARIOS} сценария.`);
+      throw new Error(`Cannot add more than ${MAX_SCENARIOS} scenarios.`);
     }
     return new ScenarioComparison(
       this.id,
