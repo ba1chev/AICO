@@ -20,6 +20,10 @@ import type { ScenarioComparisonService } from '@domains/scenarios/services/Scen
 
 import type { ReportsService } from '@domains/reports/services/ReportsService';
 
+import type { UserManagementService } from '@domains/admin/services/UserManagementService';
+import type { HardwareProfileService } from '@domains/admin/services/HardwareProfileService';
+import type { DashboardService } from '@domains/dashboard/services/DashboardService';
+
 export const TOKENS = {
   EventBus: createToken<EventBus>('EventBus'),
   Storage: createToken<IStorage>('Storage'),
@@ -41,4 +45,8 @@ export const TOKENS = {
   ScenarioComparison: createToken<ScenarioComparisonService>('ScenarioComparisonService'),
 
   Reports: createToken<ReportsService>('ReportsService'),
+
+  UserManagement: createToken<UserManagementService>('UserManagementService'),
+  HardwareProfile: createToken<HardwareProfileService>('HardwareProfileService'),
+  Dashboard: createToken<DashboardService>('DashboardService'),
 } as const;
