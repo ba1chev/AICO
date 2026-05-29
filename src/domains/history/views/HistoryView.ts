@@ -10,6 +10,7 @@ import {
   type SortDirection,
 } from '../services/HistoryFilter';
 import { ScenarioComparisonService } from '@domains/scenarios/services/ScenarioComparisonService';
+import { LineChart } from '@core/charts';
 
 export class HistoryView extends View {
   private all: Calculation[] = [];
@@ -17,6 +18,7 @@ export class HistoryView extends View {
   private sortKey: HistorySortKey = 'createdAt';
   private sortDir: SortDirection = 'desc';
   private selected = new Set<string>();
+  private trendChart: LineChart | null = null;
 
   protected override onBeforeRender(): void {
     const repo = this.container.resolve(TOKENS.CalculationRepository);
@@ -95,6 +97,8 @@ export class HistoryView extends View {
           ${totalWater.toFixed(1)} L вода
         </div>
 
+        ${visible.length >= 2 ? `<div class="history-trend"><h2>Тренд на CO₂e</h2><div data-chart="trend"></div></div>` : ''}
+
         <div class="history-actions">
           <button type="button" class="btn btn--primary" id="btn-compare"
             ${this.selected.size < 2 ? 'disabled' : ''}>
@@ -120,6 +124,7 @@ export class HistoryView extends View {
         .history-actions {
           display: flex; gap: var(--space-3); margin-bottom: var(--space-3);
         }
+        .history-trend { margin: var(--space-4) 0; }
         .history-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
         .history-table th, .history-table td {
           padding: var(--space-2) var(--space-3);
@@ -198,6 +203,8 @@ export class HistoryView extends View {
   }
 
   protected override onAfterRender(): void {
+    this.mountTrendChart();
+
     this.on('#history-filter', 'input', () => this.readFilters());
     this.on('#history-filter', 'change', () => this.readFilters());
     this.on('#history-filter', 'reset', () => {
@@ -243,6 +250,22 @@ export class HistoryView extends View {
       this.selected.clear();
       this.rerender();
     });
+  }
+
+  private mountTrendChart(): void {
+    const host = this.root.querySelector<HTMLElement>('[data-chart="trend"]');
+    if (!host) return;
+    const visible = applySort(applyFilter(this.all, this.filter), 'createdAt', 'asc');
+    if (visible.length < 2) return;
+    this.trendChart = new LineChart({
+      title: 'Тренд на CO₂e във времето',
+      description: 'Линейна графика на CO₂e (kg) за всяко изчисление, подредени по дата.',
+      yLabel: 'CO₂e (kg)',
+      data: visible.map((c) => ({ date: c.createdAt, value: c.result.co2eKg })),
+      formatValue: (v) => `${v.toFixed(2)} kg`,
+    });
+    this.trendChart.mount(host);
+    this.disposers.push(() => this.trendChart?.unmount());
   }
 
   private readFilters(): void {
