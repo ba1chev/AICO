@@ -49,7 +49,9 @@ export class Router {
 
   currentPath(): string {
     const raw = window.location.hash || '#/';
-    return raw.startsWith('#') ? raw.slice(1) : raw;
+    const stripped = raw.startsWith('#') ? raw.slice(1) : raw;
+    const qIdx = stripped.indexOf('?');
+    return qIdx === -1 ? stripped : stripped.slice(0, qIdx);
   }
 
   private async resolve(): Promise<void> {
