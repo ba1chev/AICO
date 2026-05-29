@@ -31,7 +31,7 @@ export class CalculationResult {
       typeof o.co2eGrams !== 'number' ||
       typeof o.waterLiters !== 'number'
     ) {
-      throw new Error('CalculationResult: невалиден JSON.');
+      throw new Error('CalculationResult: invalid JSON.');
     }
     return new CalculationResult(o.energyKWh, o.co2eGrams, o.waterLiters);
   }
