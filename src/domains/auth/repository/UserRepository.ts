@@ -76,7 +76,7 @@ export class UserRepository extends Repository<User> {
         credentials: entity.credentials,
       };
     }
-    throw ValidationError.of('user', `Не може да се сериализира потребител с роля ${entity.role}.`);
+    throw ValidationError.of('user', `Cannot serialize user with role ${entity.role}.`);
   }
 
   protected override deserialize(raw: unknown): User {
@@ -106,7 +106,7 @@ export class UserRepository extends Repository<User> {
       case 'admin':
         return new Admin(dto.id, dto.email, dto.displayName, created, dto.credentials);
       default:
-        throw ValidationError.of('role', `Невалидна роля в storage: ${(dto as UserDTO).role}`);
+        throw ValidationError.of('role', `Invalid role in storage: ${(dto as UserDTO).role}`);
     }
   }
 }
