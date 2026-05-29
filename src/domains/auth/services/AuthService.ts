@@ -41,7 +41,7 @@ export class AuthService {
       return this.currentUser;
     }
     const user = this.users.findById(session.userId);
-    if (!user) {
+    if (!user || !user.active) {
       this.sessions.clear();
       this.currentUser = new Guest();
       return this.currentUser;
@@ -118,6 +118,12 @@ export class AuthService {
     const creds = user ? extractCredentials(user) : null;
     if (!user || !creds) {
       throw new DomainError('Login failed: user not found', 'Грешен имейл или парола.');
+    }
+    if (!user.active) {
+      throw new DomainError(
+        'Login failed: account deactivated',
+        'Профилът е деактивиран. Свържете се с администратор.',
+      );
     }
     const ok = await this.hasher.verify(password, creds);
     if (!ok) {
