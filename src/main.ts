@@ -27,12 +27,16 @@ import { SessionManager } from '@domains/auth/services/SessionManager';
 import { AuthService } from '@domains/auth/services/AuthService';
 import { OAuthProviderStub } from '@domains/auth/services/OAuthProviderStub';
 import { seedAdminIfMissing } from '@domains/auth/services/seedAdmin';
-import { AuthGuard, GuestOnlyGuard } from '@domains/auth/guards/AuthGuards';
+import { AuthGuard, GuestOnlyGuard, RoleGuard } from '@domains/auth/guards/AuthGuards';
 
 import { ScenarioRepository } from '@domains/scenarios/repository/ScenarioRepository';
 import { ScenarioComparisonService } from '@domains/scenarios/services/ScenarioComparisonService';
 
 import { ReportsService } from '@domains/reports/services/ReportsService';
+
+import { UserManagementService } from '@domains/admin/services/UserManagementService';
+import { HardwareProfileService } from '@domains/admin/services/HardwareProfileService';
+import { DashboardService } from '@domains/dashboard/services/DashboardService';
 
 async function bootstrap(): Promise<void> {
   const host = document.getElementById('app');
@@ -88,6 +92,19 @@ async function bootstrap(): Promise<void> {
     (c) => new ReportsService(c.resolve(TOKENS.CalculationRepository)),
   );
 
+  container.registerSingleton(
+    TOKENS.UserManagement,
+    (c) => new UserManagementService(c.resolve(TOKENS.Users), c.resolve(TOKENS.Auth)),
+  );
+  container.registerSingleton(
+    TOKENS.HardwareProfile,
+    (c) => new HardwareProfileService(c.resolve(TOKENS.HardwareCatalog), c.resolve(TOKENS.Storage)),
+  );
+  container.registerSingleton(
+    TOKENS.Dashboard,
+    (c) => new DashboardService(c.resolve(TOKENS.CalculationRepository)),
+  );
+
   await i18n.load('bg').catch((err) => {
     console.warn('[bootstrap] i18n failed to load:', err);
   });
@@ -104,6 +121,8 @@ async function bootstrap(): Promise<void> {
   const auth = container.resolve(TOKENS.Auth);
   const authGuard = () => new AuthGuard(auth, router);
   const guestOnly = () => new GuestOnlyGuard(auth, router);
+  const adminOnly = () => new RoleGuard(auth, router, ['admin']);
+  const dashboardRoles = () => new RoleGuard(auth, router, ['admin', 'organization', 'researcher']);
 
   router
     .register({ path: '/', view: HomeView, title: 'Начало' })
@@ -152,6 +171,30 @@ async function bootstrap(): Promise<void> {
       view: () => import('./domains/reports/views/ReportsView'),
       guards: [authGuard()],
       title: 'Отчети',
+    })
+    .register({
+      path: '/dashboard',
+      view: () => import('./domains/dashboard/views/DashboardView'),
+      guards: [dashboardRoles()],
+      title: 'Табло',
+    })
+    .register({
+      path: '/admin',
+      view: () => import('./domains/admin/views/AdminView'),
+      guards: [adminOnly()],
+      title: 'Администрация',
+    })
+    .register({
+      path: '/admin/users',
+      view: () => import('./domains/admin/views/UserManagementView'),
+      guards: [adminOnly()],
+      title: 'Потребители',
+    })
+    .register({
+      path: '/admin/hardware',
+      view: () => import('./domains/admin/views/HardwareProfilesView'),
+      guards: [adminOnly()],
+      title: 'Хардуерни профили',
     })
     .registerNotFound(NotFoundView);
 
