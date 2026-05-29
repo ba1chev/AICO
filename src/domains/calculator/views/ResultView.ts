@@ -4,9 +4,12 @@ import { formatCO2, formatEnergy, formatWater, formatNumberBG } from '@core/util
 import { formatDateTimeBG } from '@core/utils/date';
 import { WorkloadLabelBG } from '../models/WorkloadType';
 import type { Calculation } from '../models/Calculation';
+import { BarChart, PieChart } from '@core/charts';
 
 export class ResultView extends View {
   private calc: Calculation | null = null;
+  private barChart: BarChart | null = null;
+  private pieChart: PieChart | null = null;
 
   protected override onBeforeRender(): void {
     const id = this.params['id'];
@@ -45,7 +48,13 @@ export class ResultView extends View {
 
         <div>
           <h2>Графика на емисиите</h2>
-          ${this.renderBarChart()}
+          <div data-chart="bar"></div>
+        </div>
+
+        <div>
+          <h2>Относителен дял</h2>
+          <p class="muted">Нормализирано спрямо средни референтни стойности — само за визуално сравнение.</p>
+          <div data-chart="pie"></div>
         </div>
 
         <div>
@@ -82,54 +91,95 @@ export class ResultView extends View {
         }
         .metric-card__label { font-size: var(--fs-sm); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .metric-card__value { font-size: var(--fs-2xl); font-weight: var(--fw-bold); margin-top: var(--space-1); }
-        .bar-chart text { font-family: var(--font-body); font-size: 12px; fill: var(--color-text); }
       </style>
     `;
   }
 
-  private renderBarChart(): string {
-    if (!this.calc) return '';
+  protected override onAfterRender(): void {
+    if (!this.calc) return;
     const r = this.calc.result;
-    const series = [
-      { label: 'Енергия (kWh)', value: r.energyKWh, color: '#f9a825' },
-      { label: 'CO₂e (kg)', value: r.co2eKg, color: '#6d4c41' },
-      { label: 'Вода (L)', value: r.waterLiters, color: '#0277bd' },
-    ];
 
-    const width = 600;
-    const height = 220;
-    const padding = { top: 20, right: 20, bottom: 40, left: 110 };
-    const innerW = width - padding.left - padding.right;
-    const innerH = height - padding.top - padding.bottom;
-    const max = Math.max(...series.map((s) => s.value), 0.001);
-    const barH = innerH / series.length - 8;
+    const barHost = this.root.querySelector<HTMLElement>('[data-chart="bar"]');
+    if (barHost) {
+      this.barChart = new BarChart({
+        title: 'Сравнителна графика на резултатите',
+        description: 'Хоризонтална стълбовидна диаграма с енергия, CO₂e и вода.',
+        data: [
+          {
+            label: 'Енергия (kWh)',
+            value: r.energyKWh,
+            color: 'var(--color-energy, #f9a825)',
+            formattedValue: formatNumberBG(r.energyKWh, 3),
+          },
+          {
+            label: 'CO₂e (kg)',
+            value: r.co2eKg,
+            color: 'var(--color-co2, #6d4c41)',
+            formattedValue: formatNumberBG(r.co2eKg, 3),
+          },
+          {
+            label: 'Вода (L)',
+            value: r.waterLiters,
+            color: 'var(--color-water, #0277bd)',
+            formattedValue: formatNumberBG(r.waterLiters, 3),
+          },
+        ],
+      });
+      this.barChart.mount(barHost);
+      this.disposers.push(() => this.barChart?.unmount());
+    }
 
-    const bars = series
-      .map((s, i) => {
-        const w = (s.value / max) * innerW;
-        const y = padding.top + i * (barH + 8);
-        return `
-          <g>
-            <text x="${padding.left - 8}" y="${y + barH / 2 + 4}" text-anchor="end">${s.label}</text>
-            <rect x="${padding.left}" y="${y}" width="${w}" height="${barH}" fill="${s.color}" rx="4">
-              <title>${s.label}: ${formatNumberBG(s.value, 3)}</title>
-            </rect>
-            <text x="${padding.left + w + 6}" y="${y + barH / 2 + 4}">${formatNumberBG(s.value, 3)}</text>
-          </g>
-        `;
-      })
-      .join('');
-
-    return `
-      <svg class="bar-chart" viewBox="0 0 ${width} ${height}" role="img"
-           aria-labelledby="chart-title chart-desc"
-           style="width:100%; height:auto; max-width:${width}px;">
-        <title id="chart-title">Сравнителна графика на резултатите</title>
-        <desc id="chart-desc">Хоризонтална стълбовидна диаграма с енергия, CO₂e и вода.</desc>
-        ${bars}
-      </svg>
-    `;
+    const pieHost = this.root.querySelector<HTMLElement>('[data-chart="pie"]');
+    if (pieHost) {
+      const pieData = normalizedShares(r.energyKWh, r.co2eKg, r.waterLiters);
+      this.pieChart = new PieChart({
+        title: 'Относителен дял на показателите',
+        description: 'Кръгова диаграма с дела на енергия, CO₂e и вода.',
+        data: pieData,
+      });
+      this.pieChart.mount(pieHost);
+      this.disposers.push(() => this.pieChart?.unmount());
+    }
   }
+}
+
+function normalizedShares(
+  energyKWh: number,
+  co2eKg: number,
+  waterLiters: number,
+): Array<{ label: string; value: number; color: string; formattedValue: string }> {
+  const energyRef = 5;
+  const co2Ref = 2;
+  const waterRef = 10;
+  const items = [
+    {
+      label: 'Енергия',
+      raw: energyKWh,
+      norm: energyKWh / energyRef,
+      color: 'var(--color-energy, #f9a825)',
+      formatted: formatEnergy(energyKWh),
+    },
+    {
+      label: 'CO₂e',
+      raw: co2eKg,
+      norm: co2eKg / co2Ref,
+      color: 'var(--color-co2, #6d4c41)',
+      formatted: `${formatNumberBG(co2eKg, 3)} kg`,
+    },
+    {
+      label: 'Вода',
+      raw: waterLiters,
+      norm: waterLiters / waterRef,
+      color: 'var(--color-water, #0277bd)',
+      formatted: formatWater(waterLiters),
+    },
+  ];
+  return items.map((it) => ({
+    label: it.label,
+    value: Math.max(it.norm, 0),
+    color: it.color,
+    formattedValue: it.formatted,
+  }));
 }
 
 function metricCard(label: string, value: string, color: string): string {
