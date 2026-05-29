@@ -15,6 +15,6 @@ export async function seedAdminIfMissing(
   const admin = new Admin(generateId(), SEED_ADMIN_EMAIL, 'Администратор', new Date(), credentials);
   users.save(admin);
   console.info(
-    `[seed] Създаден admin: ${SEED_ADMIN_EMAIL} / ${SEED_ADMIN_PASSWORD} (само за разработка)`,
+    `[seed] Created admin: ${SEED_ADMIN_EMAIL} / ${SEED_ADMIN_PASSWORD} (development only)`,
   );
 }
