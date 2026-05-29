@@ -40,7 +40,7 @@ export class Container {
   resolve<T>(token: ServiceToken<T>): T {
     const reg = this.registry.get(token.key) as Registration<T> | undefined;
     if (!reg) {
-      throw new Error(`[Container] Услуга "${token.key}" не е регистрирана.`);
+      throw new Error(`[Container] Service "${token.key}" is not registered.`);
     }
     if (reg.singleton) {
       if (reg.instance === undefined) {
