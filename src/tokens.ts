@@ -15,6 +15,9 @@ import type { IPasswordHasher } from '@domains/auth/services/IPasswordHasher';
 import type { SessionManager } from '@domains/auth/services/SessionManager';
 import type { OAuthProviderStub } from '@domains/auth/services/OAuthProviderStub';
 
+import type { ScenarioRepository } from '@domains/scenarios/repository/ScenarioRepository';
+import type { ScenarioComparisonService } from '@domains/scenarios/services/ScenarioComparisonService';
+
 export const TOKENS = {
   EventBus: createToken<EventBus>('EventBus'),
   Storage: createToken<IStorage>('Storage'),
@@ -31,4 +34,7 @@ export const TOKENS = {
   PasswordHasher: createToken<IPasswordHasher>('PasswordHasher'),
   SessionManager: createToken<SessionManager>('SessionManager'),
   OAuth: createToken<OAuthProviderStub>('OAuthProviderStub'),
+
+  ScenarioRepository: createToken<ScenarioRepository>('ScenarioRepository'),
+  ScenarioComparison: createToken<ScenarioComparisonService>('ScenarioComparisonService'),
 } as const;
