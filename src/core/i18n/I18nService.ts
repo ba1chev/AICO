@@ -12,7 +12,7 @@ export class I18nService {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       this.translations = (await res.json()) as TranslationMap;
     } catch (err) {
-      console.warn(`[I18n] Не успяхме да заредим "${url}". Ще се ползват ключове като fallback.`, err);
+      console.warn(`[I18n] Failed to load "${url}". Falling back to keys.`, err);
       this.translations = {};
     }
   }
@@ -20,7 +20,7 @@ export class I18nService {
   t(key: string, vars?: Record<string, string | number>): string {
     let value = this.translations[key];
     if (value === undefined) {
-      console.warn(`[I18n] Липсващ ключ: "${key}"`);
+      console.warn(`[I18n] Missing key: "${key}"`);
       return key;
     }
     if (vars) {
