@@ -153,4 +153,28 @@ describe('AuthService', () => {
     const restored = await env.auth.restore();
     expect(restored.email).toBe('a@b.bg');
   });
+
+  it('login rejects deactivated accounts with DomainError', async () => {
+    await env.auth.register({
+      email: 'd@b.bg',
+      displayName: 'Dee',
+      password: 'parola123',
+      passwordConfirm: 'parola123',
+      role: 'developer',
+    });
+    env.auth.logout();
+    const stored = env.users.findByEmail('d@b.bg');
+    if (!stored) throw new Error('test setup: user missing');
+    const { Developer } = await import('@domains/auth/models/Developer');
+    const deactivated = new Developer(
+      stored.id,
+      stored.email,
+      stored.displayName,
+      stored.createdAt,
+      (stored as InstanceType<typeof Developer>).credentials,
+      false,
+    );
+    env.users.save(deactivated);
+    await expect(env.auth.login('d@b.bg', 'parola123')).rejects.toBeInstanceOf(DomainError);
+  });
 });
