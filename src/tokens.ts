@@ -18,6 +18,8 @@ import type { OAuthProviderStub } from '@domains/auth/services/OAuthProviderStub
 import type { ScenarioRepository } from '@domains/scenarios/repository/ScenarioRepository';
 import type { ScenarioComparisonService } from '@domains/scenarios/services/ScenarioComparisonService';
 
+import type { ReportsService } from '@domains/reports/services/ReportsService';
+
 export const TOKENS = {
   EventBus: createToken<EventBus>('EventBus'),
   Storage: createToken<IStorage>('Storage'),
@@ -37,4 +39,6 @@ export const TOKENS = {
 
   ScenarioRepository: createToken<ScenarioRepository>('ScenarioRepository'),
   ScenarioComparison: createToken<ScenarioComparisonService>('ScenarioComparisonService'),
+
+  Reports: createToken<ReportsService>('ReportsService'),
 } as const;
