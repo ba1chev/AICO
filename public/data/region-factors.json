@@ -1,0 +1,192 @@
+[
+  {
+    "regionId": "bg",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 410,
+        "wueLitersPerKWh": 1.9,
+        "source": "Ember 2024 estimates"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 360,
+        "wueLitersPerKWh": 1.8,
+        "source": "Ember 2026 estimates"
+      }
+    ]
+  },
+  {
+    "regionId": "de",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 420,
+        "wueLitersPerKWh": 1.8,
+        "source": "Umweltbundesamt 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 380,
+        "wueLitersPerKWh": 1.7,
+        "source": "Umweltbundesamt 2026"
+      }
+    ]
+  },
+  {
+    "regionId": "fr",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 70,
+        "wueLitersPerKWh": 1.5,
+        "source": "RTE 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 60,
+        "wueLitersPerKWh": 1.5,
+        "source": "RTE 2026"
+      }
+    ]
+  },
+  {
+    "regionId": "se",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 35,
+        "wueLitersPerKWh": 1.0,
+        "source": "Svenska Kraftnät 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 30,
+        "wueLitersPerKWh": 0.9,
+        "source": "Svenska Kraftnät 2026"
+      }
+    ]
+  },
+  {
+    "regionId": "is",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 25,
+        "wueLitersPerKWh": 0.5,
+        "source": "Landsvirkjun 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 20,
+        "wueLitersPerKWh": 0.5,
+        "source": "Landsvirkjun 2026"
+      }
+    ]
+  },
+  {
+    "regionId": "pl",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 780,
+        "wueLitersPerKWh": 2.2,
+        "source": "PSE 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 720,
+        "wueLitersPerKWh": 2.1,
+        "source": "PSE 2026"
+      }
+    ]
+  },
+  {
+    "regionId": "us-east",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 410,
+        "wueLitersPerKWh": 1.9,
+        "source": "EIA 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 380,
+        "wueLitersPerKWh": 1.8,
+        "source": "EIA 2026"
+      }
+    ]
+  },
+  {
+    "regionId": "us-west",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 270,
+        "wueLitersPerKWh": 1.7,
+        "source": "EIA 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 240,
+        "wueLitersPerKWh": 1.6,
+        "source": "EIA 2026"
+      }
+    ]
+  },
+  {
+    "regionId": "in",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 740,
+        "wueLitersPerKWh": 2.6,
+        "source": "CEA 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 710,
+        "wueLitersPerKWh": 2.5,
+        "source": "CEA 2026"
+      }
+    ]
+  },
+  {
+    "regionId": "cn",
+    "versions": [
+      {
+        "version": "2024.1",
+        "effectiveDate": "2024-01-01",
+        "carbonIntensityGCO2PerKWh": 620,
+        "wueLitersPerKWh": 2.1,
+        "source": "NBS 2024"
+      },
+      {
+        "version": "2026.1",
+        "effectiveDate": "2026-01-01",
+        "carbonIntensityGCO2PerKWh": 580,
+        "wueLitersPerKWh": 2.0,
+        "source": "NBS 2026"
+      }
+    ]
+  }
+]
