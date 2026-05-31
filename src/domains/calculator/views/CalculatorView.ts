@@ -13,9 +13,9 @@ export class CalculatorView extends View {
   private regions: Region[] = [];
 
   protected override async onBeforeRender(): Promise<void> {
-    const hwCatalog = this.container.resolve(TOKENS.HardwareCatalog);
+    const hwService = this.container.resolve(TOKENS.HardwareProfile);
     const rgCatalog = this.container.resolve(TOKENS.RegionCatalog);
-    const [hardware, regions] = await Promise.all([hwCatalog.all(), rgCatalog.all()]);
+    const [hardware, regions] = await Promise.all([hwService.merged(), rgCatalog.all()]);
     this.hardware = hardware;
     this.regions = regions;
   }
