@@ -21,6 +21,7 @@ import { RegionCatalog } from '@domains/calculator/services/RegionCatalog';
 import { RegionFactorsCatalog } from '@domains/calculator/services/RegionFactorsCatalog';
 import { StandardCalculationEngine } from '@domains/calculator/services/StandardCalculationEngine';
 import { CalculationRepository } from '@domains/calculator/repository/CalculationRepository';
+import { DriverAnalysis } from '@domains/calculator/services/DriverAnalysis';
 
 import { UserRepository } from '@domains/auth/repository/UserRepository';
 import { PBKDF2PasswordHasher } from '@domains/auth/services/PBKDF2PasswordHasher';
@@ -63,6 +64,7 @@ async function bootstrap(): Promise<void> {
     TOKENS.CalculationRepository,
     (c) => new CalculationRepository(c.resolve(TOKENS.Storage)),
   );
+  container.registerSingleton(TOKENS.DriverAnalysis, () => new DriverAnalysis());
 
   container.registerSingleton(TOKENS.PasswordHasher, () => new PBKDF2PasswordHasher());
   container.registerSingleton(TOKENS.Users, (c) => new UserRepository(c.resolve(TOKENS.Storage)));

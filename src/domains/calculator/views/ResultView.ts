@@ -1,28 +1,35 @@
 import { View } from '@core/view/View';
 import { TOKENS } from '../../../tokens';
-import { formatCO2, formatEnergy, formatWater, formatNumberBG } from '@core/utils/numbers';
+import { formatCO2, formatEnergy, formatWater, formatNumber, type Locale } from '@core/utils/numbers';
 import { formatDateTimeBG } from '@core/utils/date';
 import { WorkloadLabelBG } from '../models/WorkloadType';
 import type { Calculation } from '../models/Calculation';
 import { CalculationResult } from '../models/CalculationResult';
 import type { RegionFactor } from '../models/RegionFactor';
+import type { Driver } from '../services/DriverAnalysis';
 import { BarChart, PieChart } from '@core/charts';
 
 export class ResultView extends View {
   private calc: Calculation | null = null;
   private latestFactor: RegionFactor | null = null;
   private recomputed: { result: CalculationResult; factor: RegionFactor } | null = null;
+  private drivers: Driver[] = [];
   private barChart: BarChart | null = null;
   private pieChart: PieChart | null = null;
+  private driversChart: BarChart | null = null;
+  private locale: Locale = 'bg';
 
   protected override async onBeforeRender(): Promise<void> {
     const id = this.params['id'];
     if (!id) return;
     const repo = this.container.resolve(TOKENS.CalculationRepository);
     this.calc = repo.findById(id);
+    this.locale = this.container.resolve(TOKENS.I18n).getLocale();
     if (this.calc) {
       const factors = this.container.resolve(TOKENS.RegionFactors);
       this.latestFactor = (await factors.latestFor(this.calc.params.region.id)) ?? null;
+      const analysis = this.container.resolve(TOKENS.DriverAnalysis);
+      this.drivers = analysis.forCO2e(this.calc.params);
     }
   }
 
@@ -47,15 +54,22 @@ export class ResultView extends View {
     return `
       <section class="card stack-4">
         <header>
-          <h1>Резултат от изчислението</h1>
+          <div class="result-heading">
+            <h1>Резултат от изчислението</h1>
+            <span class="estimate-badge" role="note" title="Стойностите са оценки на базата на публични коефициенти.">Оценка</span>
+          </div>
           <p class="muted">Създаден на ${formatDateTimeBG(c.createdAt)}</p>
+          <p class="muted estimate-note">
+            Резултатите са приблизителни — базират се на средни стойности за PUE, въглеродна интензивност и WUE
+            и могат да се различават от реалното потребление на конкретен дейтацентър.
+          </p>
           ${this.versionBannerHTML(showingRecomputed, usedFactor, stale)}
         </header>
 
         <div class="grid-3">
-          ${metricCard('Енергия', formatEnergy(r.energyKWh), 'var(--color-energy)')}
-          ${metricCard('CO₂e', formatCO2(r.co2eGrams), 'var(--color-co2)')}
-          ${metricCard('Вода', formatWater(r.waterLiters), 'var(--color-water)')}
+          ${metricCard('Енергия', formatEnergy(r.energyKWh, this.locale), 'var(--color-energy)')}
+          ${metricCard('CO₂e', formatCO2(r.co2eGrams, this.locale), 'var(--color-co2)')}
+          ${metricCard('Вода', formatWater(r.waterLiters, this.locale), 'var(--color-water)')}
         </div>
 
         <div>
@@ -70,13 +84,19 @@ export class ResultView extends View {
         </div>
 
         <div>
+          <h2>Кои входни фактори влияят най-много</h2>
+          <p class="muted">Принос на всеки вход спрямо „чиста“ базова стойност (по-голям бар = по-силно увеличава резултата).</p>
+          <div data-chart="drivers"></div>
+        </div>
+
+        <div>
           <h2>Параметри</h2>
           <dl class="result-params">
             <dt>Хардуер</dt><dd>${p.hardware.displayName} (${p.hardware.powerWatts}W) × ${p.hardwareCount}</dd>
             <dt>Регион</dt><dd>${p.region.name} — ${p.region.carbonIntensityGCO2PerKWh} gCO₂/kWh, ${p.region.wueLitersPerKWh} L/kWh</dd>
-            <dt>Продължителност</dt><dd>${formatNumberBG(p.durationHours, 1)} ч.</dd>
-            <dt>PUE</dt><dd>${formatNumberBG(p.pue, 2)}</dd>
-            <dt>Натоварване</dt><dd>${formatNumberBG(p.utilization * 100, 0)}%</dd>
+            <dt>Продължителност</dt><dd>${formatNumber(p.durationHours, 1, this.locale)} ч.</dd>
+            <dt>PUE</dt><dd>${formatNumber(p.pue, 2, this.locale)}</dd>
+            <dt>Натоварване</dt><dd>${formatNumber(p.utilization * 100, 0, this.locale)}%</dd>
             <dt>Тип натоварване</dt><dd>${WorkloadLabelBG[p.workloadType]}</dd>
             <dt>Версия на фактори</dt><dd>${c.factorVersion ?? '—'}</dd>
           </dl>
@@ -89,6 +109,28 @@ export class ResultView extends View {
       </section>
 
       <style>
+        .result-heading {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          flex-wrap: wrap;
+        }
+        .estimate-badge {
+          display: inline-block;
+          padding: 2px var(--space-2);
+          border-radius: var(--radius-pill);
+          background: color-mix(in srgb, #f57c00 18%, transparent);
+          border: 1px solid color-mix(in srgb, #f57c00 40%, transparent);
+          color: #b85e00;
+          font-size: var(--fs-xs);
+          font-weight: var(--fw-semibold);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .estimate-note {
+          margin-top: var(--space-2);
+          font-size: var(--fs-sm);
+        }
         .result-params {
           display: grid;
           grid-template-columns: max-content 1fr;
@@ -142,19 +184,19 @@ export class ResultView extends View {
             label: 'Енергия (kWh)',
             value: r.energyKWh,
             color: 'var(--color-energy, #f9a825)',
-            formattedValue: formatNumberBG(r.energyKWh, 3),
+            formattedValue: formatNumber(r.energyKWh, 3, this.locale),
           },
           {
             label: 'CO₂e (kg)',
             value: r.co2eKg,
             color: 'var(--color-co2, #6d4c41)',
-            formattedValue: formatNumberBG(r.co2eKg, 3),
+            formattedValue: formatNumber(r.co2eKg, 3, this.locale),
           },
           {
             label: 'Вода (L)',
             value: r.waterLiters,
             color: 'var(--color-water, #0277bd)',
-            formattedValue: formatNumberBG(r.waterLiters, 3),
+            formattedValue: formatNumber(r.waterLiters, 3, this.locale),
           },
         ],
       });
@@ -164,7 +206,7 @@ export class ResultView extends View {
 
     const pieHost = this.root.querySelector<HTMLElement>('[data-chart="pie"]');
     if (pieHost) {
-      const pieData = normalizedShares(r.energyKWh, r.co2eKg, r.waterLiters);
+      const pieData = normalizedShares(r.energyKWh, r.co2eKg, r.waterLiters, this.locale);
       this.pieChart = new PieChart({
         title: 'Относителен дял на показателите',
         description: 'Кръгова диаграма с дела на енергия, CO₂e и вода.',
@@ -172,6 +214,23 @@ export class ResultView extends View {
       });
       this.pieChart.mount(pieHost);
       this.disposers.push(() => this.pieChart?.unmount());
+    }
+
+    const driversHost = this.root.querySelector<HTMLElement>('[data-chart="drivers"]');
+    if (driversHost && this.drivers.length > 0) {
+      const palette = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#17becf'];
+      this.driversChart = new BarChart({
+        title: 'Принос на входните фактори',
+        description: 'Хоризонтална стълбовидна диаграма с относителния принос на всеки входен параметър.',
+        data: this.drivers.map((d, i) => ({
+          label: d.label,
+          value: d.contributionPct,
+          color: palette[i % palette.length] ?? '#1f77b4',
+          formattedValue: `${formatNumber(d.contributionPct, 1, this.locale)}%`,
+        })),
+      });
+      this.driversChart.mount(driversHost);
+      this.disposers.push(() => this.driversChart?.unmount());
     }
 
     const recomputeBtn = this.root.querySelector<HTMLButtonElement>('#btn-recompute');
@@ -246,6 +305,7 @@ function normalizedShares(
   energyKWh: number,
   co2eKg: number,
   waterLiters: number,
+  locale: Locale,
 ): Array<{ label: string; value: number; color: string; formattedValue: string }> {
   const energyRef = 5;
   const co2Ref = 2;
@@ -256,21 +316,21 @@ function normalizedShares(
       raw: energyKWh,
       norm: energyKWh / energyRef,
       color: 'var(--color-energy, #f9a825)',
-      formatted: formatEnergy(energyKWh),
+      formatted: formatEnergy(energyKWh, locale),
     },
     {
       label: 'CO₂e',
       raw: co2eKg,
       norm: co2eKg / co2Ref,
       color: 'var(--color-co2, #6d4c41)',
-      formatted: `${formatNumberBG(co2eKg, 3)} kg`,
+      formatted: `${formatNumber(co2eKg, 3, locale)} kg`,
     },
     {
       label: 'Вода',
       raw: waterLiters,
       norm: waterLiters / waterRef,
       color: 'var(--color-water, #0277bd)',
-      formatted: formatWater(waterLiters),
+      formatted: formatWater(waterLiters, locale),
     },
   ];
   return items.map((it) => ({

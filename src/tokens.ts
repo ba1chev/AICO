@@ -9,6 +9,7 @@ import type { RegionCatalog } from '@domains/calculator/services/RegionCatalog';
 import type { RegionFactorsCatalog } from '@domains/calculator/services/RegionFactorsCatalog';
 import type { CalculationEngine } from '@domains/calculator/services/CalculationEngine';
 import type { CalculationRepository } from '@domains/calculator/repository/CalculationRepository';
+import type { DriverAnalysis } from '@domains/calculator/services/DriverAnalysis';
 
 import type { AuthService } from '@domains/auth/services/AuthService';
 import type { UserRepository } from '@domains/auth/repository/UserRepository';
@@ -36,6 +37,7 @@ export const TOKENS = {
   RegionFactors: createToken<RegionFactorsCatalog>('RegionFactorsCatalog'),
   CalculationEngine: createToken<CalculationEngine>('CalculationEngine'),
   CalculationRepository: createToken<CalculationRepository>('CalculationRepository'),
+  DriverAnalysis: createToken<DriverAnalysis>('DriverAnalysis'),
 
   Auth: createToken<AuthService>('AuthService'),
   Users: createToken<UserRepository>('UserRepository'),
