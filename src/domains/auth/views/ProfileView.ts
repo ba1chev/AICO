@@ -52,7 +52,11 @@ export class ProfileView extends View {
           gap: var(--space-2) var(--space-4);
         }
         .profile-grid dt { font-weight: var(--fw-semibold); color: var(--color-text-muted); }
-        .profile-grid dd { margin: 0; }
+        .profile-grid dd { margin: 0; word-break: break-word; }
+        @media (max-width: 480px) {
+          .profile-grid { grid-template-columns: 1fr; gap: var(--space-1) 0; }
+          .profile-grid dd { margin-bottom: var(--space-2); }
+        }
       </style>
     `;
   }

@@ -143,7 +143,11 @@ export class ResultView extends View {
           gap: var(--space-2) var(--space-4);
         }
         .result-params dt { font-weight: var(--fw-semibold); color: var(--color-text-muted); }
-        .result-params dd { margin: 0; }
+        .result-params dd { margin: 0; word-break: break-word; }
+        @media (max-width: 480px) {
+          .result-params { grid-template-columns: 1fr; gap: var(--space-1) 0; }
+          .result-params dd { margin-bottom: var(--space-2); }
+        }
         .metric-card {
           padding: var(--space-4);
           border-radius: var(--radius-md);
@@ -184,6 +188,7 @@ export class ResultView extends View {
           gap: var(--space-3);
           align-items: center;
           justify-content: space-between;
+          flex-wrap: wrap;
           padding: var(--space-3);
           border-radius: var(--radius-md);
           background: color-mix(in srgb, var(--color-primary, #2e7d32) 8%, transparent);
