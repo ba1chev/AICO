@@ -31,7 +31,7 @@ describe('I18nService', () => {
     } as unknown as Response) as typeof fetch;
 
     const i18n = new I18nService();
-    await i18n.load('xx');
+    await i18n.load('xx' as never);
     expect(i18n.t('any.key')).toBe('any.key');
     expect(warnSpy).toHaveBeenCalled();
   });
@@ -75,5 +75,28 @@ describe('I18nService', () => {
   it('defaults locale to bg before any load', () => {
     const i18n = new I18nService();
     expect(i18n.getLocale()).toBe('bg');
+  });
+
+  it('persists and reads locale via static helpers', () => {
+    const store = new Map<string, string>();
+    const stub = {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        store.set(k, v);
+      },
+      removeItem: (k: string) => {
+        store.delete(k);
+      },
+      clear: () => store.clear(),
+      key: () => null,
+      length: 0,
+    } as unknown as Storage;
+    vi.stubGlobal('localStorage', stub);
+
+    expect(I18nService.readPersistedLocale()).toBe('bg');
+    I18nService.persistLocale('en');
+    expect(I18nService.readPersistedLocale()).toBe('en');
+    I18nService.persistLocale('bg');
+    expect(I18nService.readPersistedLocale()).toBe('bg');
   });
 });

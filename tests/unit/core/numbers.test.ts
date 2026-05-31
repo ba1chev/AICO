@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   round,
+  formatNumber,
   formatNumberBG,
   formatEnergy,
   formatCO2,
@@ -67,11 +68,26 @@ describe('formatWater', () => {
   it('uses cubic meters at or above 1000', () => {
     expect(formatWater(1500)).toMatch(/м³$/);
   });
+  it('uses Latin units in EN locale', () => {
+    expect(formatWater(8.64, 'en')).toMatch(/L$/);
+    expect(formatWater(1500, 'en')).toMatch(/m³$/);
+  });
 });
 
 describe('formatNumberBG', () => {
   it('respects the requested precision', () => {
     const out = formatNumberBG(1.23456, 3);
     expect(out).toMatch(/1[.,]235/);
+  });
+});
+
+describe('formatNumber locale', () => {
+  it('uses BG decimal comma by default', () => {
+    expect(formatNumber(1234.56, 2)).toMatch(/,/);
+  });
+  it('uses EN decimal point in en locale', () => {
+    const out = formatNumber(1234.56, 2, 'en');
+    expect(out).toMatch(/\./);
+    expect(out).not.toMatch(/,\d{2}$/);
   });
 });

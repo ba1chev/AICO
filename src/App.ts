@@ -1,6 +1,8 @@
 import type { EventBus } from '@core/view/EventBus';
 import type { AuthService } from '@domains/auth/services/AuthService';
 import { RoleLabelBG } from '@domains/auth/models/Role';
+import { I18nService } from '@core/i18n/I18nService';
+import type { Locale } from '@core/utils/numbers';
 
 export class App {
   private readonly host: HTMLElement;
@@ -10,6 +12,7 @@ export class App {
     host: HTMLElement,
     private readonly bus: EventBus,
     private readonly auth: AuthService,
+    private readonly i18n: I18nService,
   ) {
     this.host = host;
   }
@@ -42,6 +45,9 @@ export class App {
           </nav>
           <div class="app-user" id="app-user">
             ${this.authAreaHTML()}
+          </div>
+          <div class="app-locale" id="app-locale" role="group" aria-label="Език / Language">
+            ${this.localeSwitcherHTML()}
           </div>
         </div>
       </header>
@@ -96,6 +102,7 @@ export class App {
 
   private bindAuthArea(): void {
     this.attachLogoutHandler();
+    this.attachLocaleHandler();
   }
 
   private refreshAuthArea(): void {
@@ -105,6 +112,37 @@ export class App {
     if (userArea) userArea.innerHTML = this.authAreaHTML();
     this.attachLogoutHandler();
     this.bindNavHighlight();
+  }
+
+  private localeSwitcherHTML(): string {
+    const current = this.i18n.getLocale();
+    const btn = (l: Locale, label: string): string => {
+      const active = l === current;
+      return `<button type="button" class="app-locale__btn${active ? ' app-locale__btn--active' : ''}" data-locale="${l}" aria-pressed="${active}">${label}</button>`;
+    };
+    return `${btn('bg', 'BG')}${btn('en', 'EN')}`;
+  }
+
+  private attachLocaleHandler(): void {
+    const root = this.host.querySelector<HTMLElement>('#app-locale');
+    if (!root) return;
+    root.addEventListener('click', (ev) => {
+      const target = ev.target;
+      if (!(target instanceof HTMLElement)) return;
+      const btn = target.closest<HTMLButtonElement>('button[data-locale]');
+      if (!btn) return;
+      const next = btn.dataset['locale'] as Locale | undefined;
+      if (!next || next === this.i18n.getLocale()) return;
+      void this.switchLocale(next);
+    });
+  }
+
+  private async switchLocale(locale: Locale): Promise<void> {
+    await this.i18n.load(locale);
+    I18nService.persistLocale(locale);
+    const root = this.host.querySelector<HTMLElement>('#app-locale');
+    if (root) root.innerHTML = this.localeSwitcherHTML();
+    this.bus.emit('i18n:changed', { locale });
   }
 
   private attachLogoutHandler(): void {

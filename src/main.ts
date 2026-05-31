@@ -110,14 +110,14 @@ async function bootstrap(): Promise<void> {
     (c) => new DashboardService(c.resolve(TOKENS.CalculationRepository)),
   );
 
-  await i18n.load('bg').catch((err) => {
+  await i18n.load(I18nService.readPersistedLocale()).catch((err) => {
     console.warn('[bootstrap] i18n failed to load:', err);
   });
 
   await seedAdminIfMissing(container.resolve(TOKENS.Users), container.resolve(TOKENS.PasswordHasher));
   await container.resolve(TOKENS.Auth).restore();
 
-  const app = new App(host, bus, container.resolve(TOKENS.Auth));
+  const app = new App(host, bus, container.resolve(TOKENS.Auth), i18n);
   const outlet = app.render();
 
   const router = new Router(outlet, container, bus);

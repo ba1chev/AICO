@@ -1,0 +1,29 @@
+{
+  "app.title": "AICO",
+  "nav.home": "Home",
+  "nav.calculator": "Calculator",
+  "nav.history": "History",
+  "nav.compare": "Compare",
+  "nav.reports": "Reports",
+  "nav.dashboard": "Dashboard",
+  "nav.login": "Sign in",
+  "nav.register": "Sign up",
+
+  "calculator.title": "AI footprint calculator",
+  "calculator.hardware": "Hardware",
+  "calculator.region": "Region",
+  "calculator.duration": "Duration (hours)",
+  "calculator.pue": "PUE (datacenter energy efficiency)",
+  "calculator.utilization": "Utilization (0–1)",
+  "calculator.workload": "Workload type",
+  "calculator.submit": "Calculate",
+
+  "result.title": "Result",
+  "result.energy": "Energy (kWh)",
+  "result.co2": "CO₂e emissions (kg)",
+  "result.water": "Water (liters)",
+
+  "common.loading": "Loading…",
+  "common.error": "An error occurred",
+  "common.back": "Back"
+}

@@ -1,10 +1,14 @@
+import type { Locale } from '@core/utils/numbers';
+
 type TranslationMap = Record<string, string>;
+
+const LOCALE_STORAGE_KEY = 'aico:locale';
 
 export class I18nService {
   private translations: TranslationMap = {};
-  private locale = 'bg';
+  private locale: Locale = 'bg';
 
-  async load(locale: string, basePath = '/data/i18n'): Promise<void> {
+  async load(locale: Locale, basePath = '/data/i18n'): Promise<void> {
     this.locale = locale;
     const url = `${basePath}/${locale}.json`;
     try {
@@ -31,7 +35,24 @@ export class I18nService {
     return value;
   }
 
-  getLocale(): string {
+  getLocale(): Locale {
     return this.locale;
+  }
+
+  static readPersistedLocale(): Locale {
+    try {
+      const v = localStorage.getItem(LOCALE_STORAGE_KEY);
+      return v === 'en' ? 'en' : 'bg';
+    } catch {
+      return 'bg';
+    }
+  }
+
+  static persistLocale(locale: Locale): void {
+    try {
+      localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+    } catch {
+      // localStorage unavailable (private mode, quota) — silently no-op
+    }
   }
 }
