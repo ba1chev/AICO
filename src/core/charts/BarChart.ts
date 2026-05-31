@@ -1,6 +1,6 @@
 import { scaleLinear, scaleBand } from 'd3-scale';
 import { max as d3max } from 'd3-array';
-import { ChartComponent, type ChartAccessibility } from './ChartComponent';
+import { ChartComponent, type ChartAccessibility, type ChartTableRow } from './ChartComponent';
 
 export interface BarDatum {
   label: string;
@@ -26,6 +26,13 @@ export class BarChart extends ChartComponent {
 
   protected override accessibility(): ChartAccessibility {
     return { title: this.opts.title, description: this.opts.description };
+  }
+
+  protected override dataTable(): ChartTableRow[] {
+    return this.opts.data.map((d) => ({
+      label: d.label,
+      value: d.formattedValue ?? String(d.value),
+    }));
   }
 
   protected override defaultAspectRatio(): number {

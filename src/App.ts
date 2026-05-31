@@ -22,8 +22,13 @@ export class App {
     this.outlet = this.host.querySelector<HTMLElement>('#main')!;
     this.bindNavHighlight();
     this.bindAuthArea();
+    this.bindSkipLink();
     this.bus.on<{ path: string }>('router:navigated', ({ path }) => {
       this.highlightActive(path);
+      this.announceRoute(path);
+    });
+    this.bus.on<{ path: string }>('router:denied', ({ path }) => {
+      this.announce(`Достъпът до ${path} е отказан.`);
     });
     this.bus.on('auth:login', () => this.refreshAuthArea());
     this.bus.on('auth:logout', () => this.refreshAuthArea());
@@ -32,8 +37,19 @@ export class App {
     return this.outlet;
   }
 
+  private bindSkipLink(): void {
+    const link = this.host.querySelector<HTMLAnchorElement>('#app-skip');
+    if (!link) return;
+    link.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      this.outlet.focus();
+      this.outlet.scrollIntoView({ block: 'start' });
+    });
+  }
+
   private template(): string {
     return `
+      <a class="sr-only sr-only--focusable" id="app-skip" href="#" data-skip-to="main">Към основното съдържание</a>
       <header class="app-header" role="banner">
         <div class="app-header__inner">
           <a class="app-logo" href="#/" aria-label="AICO — начало">
@@ -53,6 +69,8 @@ export class App {
       </header>
 
       <main id="main" class="app-main" role="main" tabindex="-1"></main>
+
+      <div id="app-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
       <footer class="app-footer" role="contentinfo">
         <p class="app-footer__disclaimer">
@@ -157,6 +175,20 @@ export class App {
   private bindNavHighlight(): void {
     const initial = (window.location.hash || '#/').replace(/^#/, '');
     this.highlightActive(initial);
+  }
+
+  private announceRoute(path: string): void {
+    const title = document.title || path;
+    this.announce(`Зареден изглед: ${title}`);
+  }
+
+  private announce(message: string): void {
+    const region = this.host.querySelector<HTMLElement>('#app-announcer');
+    if (!region) return;
+    region.textContent = '';
+    window.setTimeout(() => {
+      region.textContent = message;
+    }, 50);
   }
 
   private highlightActive(path: string): void {

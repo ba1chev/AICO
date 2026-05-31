@@ -3,7 +3,7 @@ import { line as d3line, curveMonotoneX } from 'd3-shape';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { extent as d3extent, max as d3max } from 'd3-array';
 import { timeFormat } from 'd3-time-format';
-import { ChartComponent, type ChartAccessibility } from './ChartComponent';
+import { ChartComponent, type ChartAccessibility, type ChartTableRow } from './ChartComponent';
 
 export interface LinePoint {
   date: Date;
@@ -29,6 +29,14 @@ export class LineChart extends ChartComponent {
 
   protected override accessibility(): ChartAccessibility {
     return { title: this.opts.title, description: this.opts.description };
+  }
+
+  protected override dataTable(): ChartTableRow[] {
+    const fmt = this.opts.formatValue ?? ((v: number) => v.toFixed(2));
+    const dateFmt = timeFormat('%d.%m.%Y');
+    return [...this.opts.data]
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .map((d) => ({ label: dateFmt(d.date), value: fmt(d.value) }));
   }
 
   protected override defaultAspectRatio(): number {

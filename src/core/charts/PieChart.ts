@@ -1,5 +1,5 @@
 import { pie, arc, type PieArcDatum } from 'd3-shape';
-import { ChartComponent, type ChartAccessibility } from './ChartComponent';
+import { ChartComponent, type ChartAccessibility, type ChartTableRow } from './ChartComponent';
 
 export interface PieDatum {
   label: string;
@@ -25,6 +25,17 @@ export class PieChart extends ChartComponent {
 
   protected override accessibility(): ChartAccessibility {
     return { title: this.opts.title, description: this.opts.description };
+  }
+
+  protected override dataTable(): ChartTableRow[] {
+    const total = this.opts.data.reduce((s, d) => s + (d.value > 0 ? d.value : 0), 0);
+    return this.opts.data
+      .filter((d) => d.value > 0)
+      .map((d) => {
+        const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : '0.0';
+        const valuePart = d.formattedValue ?? String(d.value);
+        return { label: d.label, value: `${valuePart} (${pct}%)` };
+      });
   }
 
   protected override defaultAspectRatio(): number {

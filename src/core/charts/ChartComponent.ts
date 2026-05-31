@@ -6,6 +6,11 @@ export interface ChartAccessibility {
   description: string;
 }
 
+export interface ChartTableRow {
+  label: string;
+  value: string;
+}
+
 export abstract class ChartComponent extends Component {
   protected svg!: Selection<SVGSVGElement, unknown, null, undefined>;
   protected width = 0;
@@ -18,18 +23,39 @@ export abstract class ChartComponent extends Component {
 
   protected abstract drawChart(): void;
 
+  protected dataTable(): ChartTableRow[] {
+    return [];
+  }
+
   protected defaultAspectRatio(): number {
     return 16 / 9;
   }
 
   protected override render(): string {
     const a11y = this.accessibility();
+    const rows = this.dataTable();
+    const tableHTML =
+      rows.length > 0
+        ? `<table class="sr-only chart__data-table">
+            <caption>${escapeText(a11y.title)} — таблица със стойности</caption>
+            <thead><tr><th scope="col">Категория</th><th scope="col">Стойност</th></tr></thead>
+            <tbody>
+              ${rows
+                .map(
+                  (r) =>
+                    `<tr><th scope="row">${escapeText(r.label)}</th><td>${escapeText(r.value)}</td></tr>`,
+                )
+                .join('')}
+            </tbody>
+          </table>`
+        : '';
     return `
       <div class="chart" role="img" aria-labelledby="${this.titleId} ${this.descId}">
-        <svg class="chart__svg" preserveAspectRatio="xMidYMid meet">
+        <svg class="chart__svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
           <title id="${this.titleId}">${escapeText(a11y.title)}</title>
           <desc id="${this.descId}">${escapeText(a11y.description)}</desc>
         </svg>
+        ${tableHTML}
       </div>
     `;
   }
