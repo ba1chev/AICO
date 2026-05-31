@@ -7,6 +7,7 @@ import type { Calculation } from '../models/Calculation';
 import { CalculationResult } from '../models/CalculationResult';
 import type { RegionFactor } from '../models/RegionFactor';
 import type { Driver } from '../services/DriverAnalysis';
+import type { Recommendation } from '../services/RecommendationService';
 import { BarChart, PieChart } from '@core/charts';
 
 export class ResultView extends View {
@@ -14,6 +15,7 @@ export class ResultView extends View {
   private latestFactor: RegionFactor | null = null;
   private recomputed: { result: CalculationResult; factor: RegionFactor } | null = null;
   private drivers: Driver[] = [];
+  private recommendations: Recommendation[] = [];
   private barChart: BarChart | null = null;
   private pieChart: PieChart | null = null;
   private driversChart: BarChart | null = null;
@@ -30,6 +32,8 @@ export class ResultView extends View {
       this.latestFactor = (await factors.latestFor(this.calc.params.region.id)) ?? null;
       const analysis = this.container.resolve(TOKENS.DriverAnalysis);
       this.drivers = analysis.forCO2e(this.calc.params);
+      const recs = this.container.resolve(TOKENS.Recommendations);
+      this.recommendations = await recs.forParams(this.calc.params, this.calc.result.co2eGrams);
     }
   }
 
@@ -71,6 +75,8 @@ export class ResultView extends View {
           ${metricCard('CO₂e', formatCO2(r.co2eGrams, this.locale), 'var(--color-co2)')}
           ${metricCard('Вода', formatWater(r.waterLiters, this.locale), 'var(--color-water)')}
         </div>
+
+        ${this.recommendationsHTML()}
 
         <div>
           <h2>Графика на емисиите</h2>
@@ -166,6 +172,44 @@ export class ResultView extends View {
           border: 1px solid color-mix(in srgb, var(--color-primary, #2e7d32) 30%, transparent);
         }
         .btn--sm { padding: var(--space-1) var(--space-3); font-size: var(--fs-sm); }
+        .recommendation-list {
+          list-style: none;
+          padding: 0;
+          margin: var(--space-3) 0 0 0;
+          display: grid;
+          gap: var(--space-2);
+        }
+        .recommendation {
+          display: flex;
+          gap: var(--space-3);
+          align-items: center;
+          justify-content: space-between;
+          padding: var(--space-3);
+          border-radius: var(--radius-md);
+          background: color-mix(in srgb, var(--color-primary, #2e7d32) 8%, transparent);
+          border: 1px solid color-mix(in srgb, var(--color-primary, #2e7d32) 25%, transparent);
+        }
+        .recommendation__main {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 0;
+        }
+        .recommendation__label { font-weight: var(--fw-semibold); }
+        .recommendation__detail { font-size: var(--fs-sm); }
+        .recommendation__savings {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 2px;
+          flex-shrink: 0;
+        }
+        .recommendation__pct {
+          font-size: var(--fs-lg);
+          font-weight: var(--fw-bold);
+          color: var(--color-primary, #2e7d32);
+        }
+        .recommendation__new { font-size: var(--fs-sm); }
       </style>
     `;
   }
@@ -248,6 +292,35 @@ export class ResultView extends View {
       this.calc.factorVersion !== null &&
       this.calc.factorVersion !== this.latestFactor.version
     );
+  }
+
+  private recommendationsHTML(): string {
+    if (this.recommendations.length === 0) return '';
+    const items = this.recommendations
+      .map((rec) => {
+        const savings = formatNumber(rec.savingsPct, 1, this.locale);
+        const newCO2 = formatCO2(rec.newCO2eGrams, this.locale);
+        return `
+          <li class="recommendation">
+            <div class="recommendation__main">
+              <span class="recommendation__label">${escapeHTML(rec.label)}</span>
+              <span class="recommendation__detail muted">${escapeHTML(rec.detail)}</span>
+            </div>
+            <div class="recommendation__savings" aria-label="Спестявания ${savings} процента">
+              <span class="recommendation__pct">−${savings}%</span>
+              <span class="recommendation__new muted">${newCO2}</span>
+            </div>
+          </li>
+        `;
+      })
+      .join('');
+    return `
+      <div class="recommendations">
+        <h2>По-зелени алтернативи</h2>
+        <p class="muted">Препоръки за намаляване на CO₂e — сравнени с текущите параметри.</p>
+        <ul class="recommendation-list">${items}</ul>
+      </div>
+    `;
   }
 
   private versionBannerHTML(
