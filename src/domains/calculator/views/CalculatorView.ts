@@ -104,7 +104,7 @@ export class CalculatorView extends View {
     this.on('#region', 'change', () => this.syncPUEFromRegion());
     this.on('#calc-form', 'submit', (e) => {
       e.preventDefault();
-      this.handleSubmit();
+      void this.handleSubmit();
     });
     this.syncPUEFromRegion();
   }
@@ -118,7 +118,7 @@ export class CalculatorView extends View {
     }
   }
 
-  private handleSubmit(): void {
+  private async handleSubmit(): Promise<void> {
     const errBox = this.$('#form-errors');
     errBox.textContent = '';
 
@@ -150,7 +150,17 @@ export class CalculatorView extends View {
       const auth = this.container.resolve(TOKENS.Auth);
       const user = auth.current();
       const userId = user.isAuthenticated() ? user.id : null;
-      const calc = new Calculation(generateId(), params, result, new Date(), userId, null);
+      const factors = this.container.resolve(TOKENS.RegionFactors);
+      const latest = await factors.latestFor(region.id);
+      const calc = new Calculation(
+        generateId(),
+        params,
+        result,
+        new Date(),
+        userId,
+        null,
+        latest?.version ?? null,
+      );
 
       const repo = this.container.resolve(TOKENS.CalculationRepository);
       repo.save(calc);

@@ -12,6 +12,7 @@ interface CalculationDTO {
   createdAt: string;
   userId: string | null;
   label: string | null;
+  factorVersion?: string | null;
   params: {
     hardware: unknown;
     region: unknown;
@@ -35,6 +36,7 @@ export class CalculationRepository extends Repository<Calculation> {
       createdAt: entity.createdAt.toISOString(),
       userId: entity.userId,
       label: entity.label,
+      factorVersion: entity.factorVersion,
       params: {
         hardware: {
           id: entity.params.hardware.id,
@@ -83,6 +85,7 @@ export class CalculationRepository extends Repository<Calculation> {
       new Date(dto.createdAt),
       dto.userId,
       dto.label,
+      dto.factorVersion ?? null,
     );
   }
 }

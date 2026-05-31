@@ -10,6 +10,7 @@ export class Calculation implements Identifiable {
     public readonly createdAt: Date,
     public readonly userId: string | null = null,
     public readonly label: string | null = null,
+    public readonly factorVersion: string | null = null,
   ) {
     Object.freeze(this);
   }
