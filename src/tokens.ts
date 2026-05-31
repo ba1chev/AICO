@@ -6,6 +6,7 @@ import type { Router } from '@core/router/Router';
 
 import type { HardwareCatalog } from '@domains/calculator/services/HardwareCatalog';
 import type { RegionCatalog } from '@domains/calculator/services/RegionCatalog';
+import type { RegionFactorsCatalog } from '@domains/calculator/services/RegionFactorsCatalog';
 import type { CalculationEngine } from '@domains/calculator/services/CalculationEngine';
 import type { CalculationRepository } from '@domains/calculator/repository/CalculationRepository';
 
@@ -32,6 +33,7 @@ export const TOKENS = {
 
   HardwareCatalog: createToken<HardwareCatalog>('HardwareCatalog'),
   RegionCatalog: createToken<RegionCatalog>('RegionCatalog'),
+  RegionFactors: createToken<RegionFactorsCatalog>('RegionFactorsCatalog'),
   CalculationEngine: createToken<CalculationEngine>('CalculationEngine'),
   CalculationRepository: createToken<CalculationRepository>('CalculationRepository'),
 

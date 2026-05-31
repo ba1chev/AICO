@@ -18,6 +18,7 @@ import { NotFoundView } from './views/NotFoundView';
 
 import { HardwareCatalog } from '@domains/calculator/services/HardwareCatalog';
 import { RegionCatalog } from '@domains/calculator/services/RegionCatalog';
+import { RegionFactorsCatalog } from '@domains/calculator/services/RegionFactorsCatalog';
 import { StandardCalculationEngine } from '@domains/calculator/services/StandardCalculationEngine';
 import { CalculationRepository } from '@domains/calculator/repository/CalculationRepository';
 
@@ -52,7 +53,11 @@ async function bootstrap(): Promise<void> {
   container.registerInstance(TOKENS.I18n, i18n);
 
   container.registerSingleton(TOKENS.HardwareCatalog, () => new HardwareCatalog());
-  container.registerSingleton(TOKENS.RegionCatalog, () => new RegionCatalog());
+  container.registerSingleton(TOKENS.RegionFactors, () => new RegionFactorsCatalog());
+  container.registerSingleton(
+    TOKENS.RegionCatalog,
+    (c) => new RegionCatalog(c.resolve(TOKENS.RegionFactors)),
+  );
   container.registerSingleton(TOKENS.CalculationEngine, () => new StandardCalculationEngine());
   container.registerSingleton(
     TOKENS.CalculationRepository,
