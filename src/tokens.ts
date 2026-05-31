@@ -26,6 +26,7 @@ import type { ReportsService } from '@domains/reports/services/ReportsService';
 import type { UserManagementService } from '@domains/admin/services/UserManagementService';
 import type { HardwareProfileService } from '@domains/admin/services/HardwareProfileService';
 import type { DashboardService } from '@domains/dashboard/services/DashboardService';
+import type { UserPreferencesService } from '@domains/preferences/services/UserPreferencesService';
 
 export const TOKENS = {
   EventBus: createToken<EventBus>('EventBus'),
@@ -55,4 +56,5 @@ export const TOKENS = {
   UserManagement: createToken<UserManagementService>('UserManagementService'),
   HardwareProfile: createToken<HardwareProfileService>('HardwareProfileService'),
   Dashboard: createToken<DashboardService>('DashboardService'),
+  Preferences: createToken<UserPreferencesService>('UserPreferencesService'),
 } as const;

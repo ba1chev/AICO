@@ -56,13 +56,19 @@ export class ResultView extends View {
     const stale = this.isStale();
 
     return `
+      <header class="page-heading">
+        <span class="page-heading__icon page-heading__icon--green" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </span>
+        <div class="page-heading__main">
+          <h1 class="page-heading__title">Резултат от изчислението</h1>
+          <p class="page-heading__subtitle">Създаден на ${formatDateTimeBG(c.createdAt)}${c.label ? ` · ${escapeHTML(c.label)}` : ''}</p>
+        </div>
+        <span class="estimate-badge" role="note" title="Стойностите са оценки на базата на публични коефициенти.">Оценка</span>
+      </header>
+
       <section class="card stack-4">
         <header>
-          <div class="result-heading">
-            <h1>Резултат от изчислението</h1>
-            <span class="estimate-badge" role="note" title="Стойностите са оценки на базата на публични коефициенти.">Оценка</span>
-          </div>
-          <p class="muted">Създаден на ${formatDateTimeBG(c.createdAt)}</p>
           <p class="muted estimate-note">
             Резултатите са приблизителни — базират се на средни стойности за PUE, въглеродна интензивност и WUE
             и могат да се различават от реалното потребление на конкретен дейтацентър.
@@ -71,9 +77,9 @@ export class ResultView extends View {
         </header>
 
         <div class="grid-3">
-          ${metricCard('Енергия', formatEnergy(r.energyKWh, this.locale), 'var(--color-energy)')}
-          ${metricCard('CO₂e', formatCO2(r.co2eGrams, this.locale), 'var(--color-co2)')}
-          ${metricCard('Вода', formatWater(r.waterLiters, this.locale), 'var(--color-water)')}
+          ${metricTile('Енергия', formatEnergy(r.energyKWh, this.locale), 'energy')}
+          ${metricTile('CO₂e', formatCO2(r.co2eGrams, this.locale), 'co2')}
+          ${metricTile('Вода', formatWater(r.waterLiters, this.locale), 'water')}
         </div>
 
         ${this.recommendationsHTML()}
@@ -419,11 +425,20 @@ function normalizedShares(
   }));
 }
 
-function metricCard(label: string, value: string, color: string): string {
+function metricTile(label: string, value: string, kind: 'energy' | 'co2' | 'water'): string {
+  const icon =
+    kind === 'energy'
+      ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
+      : kind === 'co2'
+        ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/></svg>`
+        : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
   return `
-    <div class="metric-card" style="border-left-color: ${color};">
-      <div class="metric-card__label">${label}</div>
-      <div class="metric-card__value">${value}</div>
+    <div class="metric-tile">
+      <span class="metric-tile__icon metric-tile__icon--${kind}" aria-hidden="true">${icon}</span>
+      <div class="metric-tile__body">
+        <span class="metric-tile__label">${label}</span>
+        <span class="metric-tile__value">${value}</span>
+      </div>
     </div>
   `;
 }

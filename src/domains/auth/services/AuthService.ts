@@ -166,6 +166,107 @@ export class AuthService {
     this.sessions.save(session);
     this.currentUser = user;
   }
+
+  async updateProfile(input: { displayName?: string; organizationName?: string; affiliation?: string }): Promise<User> {
+    const current = this.currentUser;
+    if (!current.isAuthenticated()) {
+      throw new DomainError('Not authenticated', 'Не сте влезли в системата.');
+    }
+    const errors: FieldError[] = [];
+    const displayName = input.displayName?.trim();
+    if (displayName !== undefined && displayName.length < 2) {
+      errors.push({ field: 'displayName', message: 'Името трябва да е поне 2 символа.' });
+    }
+    if (errors.length) throw new ValidationError(errors);
+
+    const finalName = displayName ?? current.displayName;
+    let updated: User;
+    if (current instanceof Organization) {
+      updated = new Organization(
+        current.id,
+        current.email,
+        finalName,
+        current.createdAt,
+        current.credentials,
+        input.organizationName?.trim() || current.organizationName,
+        current.active,
+      );
+    } else if (current instanceof Researcher) {
+      updated = new Researcher(
+        current.id,
+        current.email,
+        finalName,
+        current.createdAt,
+        current.credentials,
+        input.affiliation?.trim() ?? current.affiliation,
+        current.active,
+      );
+    } else if (current instanceof Developer) {
+      updated = new Developer(
+        current.id,
+        current.email,
+        finalName,
+        current.createdAt,
+        current.credentials,
+        current.active,
+      );
+    } else if (current instanceof Admin) {
+      updated = new Admin(current.id, current.email, finalName, current.createdAt, current.credentials, current.active);
+    } else {
+      throw new DomainError('Cannot update guest profile', 'Не можете да редактирате гост профил.');
+    }
+    this.users.save(updated);
+    this.currentUser = updated;
+    this.bus.emit('auth:profile-updated', { user: updated });
+    return updated;
+  }
+
+  async changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Promise<void> {
+    const current = this.currentUser;
+    const creds = extractCredentials(current);
+    if (!current.isAuthenticated() || !creds) {
+      throw new DomainError('Not authenticated', 'Не сте влезли в системата.');
+    }
+    const errors: FieldError[] = [];
+    if (newPassword.length < 8) {
+      errors.push({ field: 'newPassword', message: 'Паролата трябва да е поне 8 символа.' });
+    }
+    if (newPassword !== confirmPassword) {
+      errors.push({ field: 'confirmPassword', message: 'Паролите не съвпадат.' });
+    }
+    if (errors.length) throw new ValidationError(errors);
+
+    const ok = await this.hasher.verify(currentPassword, creds);
+    if (!ok) {
+      throw new DomainError('Wrong current password', 'Текущата парола е грешна.');
+    }
+    const newCreds = await this.hasher.hash(newPassword);
+    let updated: User;
+    if (current instanceof Organization) {
+      updated = new Organization(current.id, current.email, current.displayName, current.createdAt, newCreds, current.organizationName, current.active);
+    } else if (current instanceof Researcher) {
+      updated = new Researcher(current.id, current.email, current.displayName, current.createdAt, newCreds, current.affiliation, current.active);
+    } else if (current instanceof Developer) {
+      updated = new Developer(current.id, current.email, current.displayName, current.createdAt, newCreds, current.active);
+    } else if (current instanceof Admin) {
+      updated = new Admin(current.id, current.email, current.displayName, current.createdAt, newCreds, current.active);
+    } else {
+      throw new DomainError('Cannot change password', 'Не може да се смени парола.');
+    }
+    this.users.save(updated);
+    this.currentUser = updated;
+  }
+
+  deleteAccount(): void {
+    const current = this.currentUser;
+    if (!current.isAuthenticated()) {
+      throw new DomainError('Not authenticated', 'Не сте влезли в системата.');
+    }
+    this.users.remove(current.id);
+    this.sessions.clear();
+    this.currentUser = new Guest();
+    this.bus.emit('auth:logout', { previous: current });
+  }
 }
 
 function extractCredentials(user: User): { passwordHash: string; passwordSalt: string; iterations: number } | null {

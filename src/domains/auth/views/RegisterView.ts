@@ -6,8 +6,13 @@ export class RegisterView extends View {
   protected override render(): string {
     return `
       <section class="card auth-card">
-        <h1>Регистрация</h1>
-        <p class="muted">Създайте профил, за да пазите изчисления и да генерирате отчети.</p>
+        <div class="auth-hero">
+          <span class="auth-hero__icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>
+          </span>
+          <h1 style="margin:0;">Създайте профил</h1>
+          <p class="muted" style="margin:0;">За да пазите изчисления и да генерирате отчети.</p>
+        </div>
 
         <form id="register-form" novalidate>
           <div class="field">
@@ -55,14 +60,39 @@ export class RegisterView extends View {
           <div id="register-errors" class="field__error" role="alert" aria-live="polite"></div>
 
           <div class="auth-actions">
-            <button type="submit" class="btn btn--primary">Регистрация</button>
-            <a class="btn btn--ghost" href="#/login">Вече имам профил</a>
+            <button type="submit" class="btn btn--primary" style="flex:1;">Регистрация</button>
           </div>
+          <p class="muted center" style="margin-top: var(--space-3);">
+            Вече имате профил? <a href="#/login">Вход</a>
+          </p>
         </form>
       </section>
 
       <style>
-        .auth-card { max-width: 520px; margin: 0 auto; }
+        .auth-card {
+          max-width: 480px;
+          margin: var(--space-8) auto;
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-3);
+        }
+        .auth-hero {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: var(--space-2);
+          text-align: center;
+        }
+        .auth-hero__icon {
+          width: 64px;
+          height: 64px;
+          border-radius: var(--radius-md);
+          background-color: var(--color-co2-soft);
+          color: var(--color-co2e);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
         .auth-actions { display: flex; gap: var(--space-3); margin-top: var(--space-4); }
       </style>
     `;

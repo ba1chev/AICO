@@ -26,11 +26,17 @@ export class ProfileView extends View {
         : '';
 
     return `
-      <section class="card stack-4 auth-card">
-        <header>
-          <h1>Профил</h1>
-        </header>
+      <header class="page-heading">
+        <span class="page-heading__icon page-heading__icon--green" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </span>
+        <div class="page-heading__main">
+          <h1 class="page-heading__title">Профил</h1>
+          <p class="page-heading__subtitle">Информация за акаунта.</p>
+        </div>
+      </header>
 
+      <section class="card stack-4 auth-card">
         <dl class="profile-grid">
           <dt>Име</dt><dd>${user.displayName}</dd>
           <dt>Имейл</dt><dd>${user.email}</dd>

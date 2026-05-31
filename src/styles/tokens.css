@@ -29,6 +29,21 @@
   --color-co2:     #6d4c41;
   --color-water:   #0277bd;
 
+  --color-co2e:        #16a34a;
+  --color-energy-soft: #fff1d6;
+  --color-co2-soft:    #e8f5e9;
+  --color-water-soft:  #e3f2fd;
+
+  --color-sidebar-bg:      #ffffff;
+  --color-sidebar-border:  #e5e7eb;
+  --color-sidebar-active:  #d4f4dd;
+  --color-sidebar-active-fg: #15803d;
+  --color-sidebar-hover:   #f3f4f6;
+
+  --color-content-bg:    #f8fafc;
+  --color-topbar-bg:     #ffffff;
+  --color-topbar-border: #e5e7eb;
+
   --space-1:  4px;
   --space-2:  8px;
   --space-3:  12px;

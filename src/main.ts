@@ -40,6 +40,7 @@ import { ReportsService } from '@domains/reports/services/ReportsService';
 import { UserManagementService } from '@domains/admin/services/UserManagementService';
 import { HardwareProfileService } from '@domains/admin/services/HardwareProfileService';
 import { DashboardService } from '@domains/dashboard/services/DashboardService';
+import { UserPreferencesService } from '@domains/preferences/services/UserPreferencesService';
 
 async function bootstrap(): Promise<void> {
   const host = document.getElementById('app');
@@ -121,6 +122,13 @@ async function bootstrap(): Promise<void> {
     TOKENS.Dashboard,
     (c) => new DashboardService(c.resolve(TOKENS.CalculationRepository)),
   );
+  container.registerSingleton(
+    TOKENS.Preferences,
+    (c) => new UserPreferencesService(c.resolve(TOKENS.Storage), c.resolve(TOKENS.EventBus)),
+  );
+
+  // Eagerly init prefs so theme is applied before first render
+  container.resolve(TOKENS.Preferences);
 
   await i18n.load(I18nService.readPersistedLocale()).catch((err) => {
     console.warn('[bootstrap] i18n failed to load:', err);
@@ -170,6 +178,12 @@ async function bootstrap(): Promise<void> {
       view: () => import('./domains/auth/views/ProfileView'),
       guards: [authGuard()],
       title: 'Профил',
+    })
+    .register({
+      path: '/settings',
+      view: () => import('./domains/preferences/views/SettingsView'),
+      guards: [authGuard()],
+      title: 'Настройки',
     })
     .register({
       path: '/history',
