@@ -4,18 +4,26 @@ import { formatCO2, formatEnergy, formatWater, formatNumberBG } from '@core/util
 import { formatDateTimeBG } from '@core/utils/date';
 import { WorkloadLabelBG } from '../models/WorkloadType';
 import type { Calculation } from '../models/Calculation';
+import { CalculationResult } from '../models/CalculationResult';
+import type { RegionFactor } from '../models/RegionFactor';
 import { BarChart, PieChart } from '@core/charts';
 
 export class ResultView extends View {
   private calc: Calculation | null = null;
+  private latestFactor: RegionFactor | null = null;
+  private recomputed: { result: CalculationResult; factor: RegionFactor } | null = null;
   private barChart: BarChart | null = null;
   private pieChart: PieChart | null = null;
 
-  protected override onBeforeRender(): void {
+  protected override async onBeforeRender(): Promise<void> {
     const id = this.params['id'];
     if (!id) return;
     const repo = this.container.resolve(TOKENS.CalculationRepository);
     this.calc = repo.findById(id);
+    if (this.calc) {
+      const factors = this.container.resolve(TOKENS.RegionFactors);
+      this.latestFactor = (await factors.latestFor(this.calc.params.region.id)) ?? null;
+    }
   }
 
   protected override render(): string {
@@ -31,13 +39,17 @@ export class ResultView extends View {
 
     const c = this.calc;
     const p = c.params;
-    const r = c.result;
+    const r = this.recomputed?.result ?? c.result;
+    const showingRecomputed = this.recomputed !== null;
+    const usedFactor = this.recomputed?.factor ?? null;
+    const stale = this.isStale();
 
     return `
       <section class="card stack-4">
         <header>
           <h1>Резултат от изчислението</h1>
           <p class="muted">Създаден на ${formatDateTimeBG(c.createdAt)}</p>
+          ${this.versionBannerHTML(showingRecomputed, usedFactor, stale)}
         </header>
 
         <div class="grid-3">
@@ -66,6 +78,7 @@ export class ResultView extends View {
             <dt>PUE</dt><dd>${formatNumberBG(p.pue, 2)}</dd>
             <dt>Натоварване</dt><dd>${formatNumberBG(p.utilization * 100, 0)}%</dd>
             <dt>Тип натоварване</dt><dd>${WorkloadLabelBG[p.workloadType]}</dd>
+            <dt>Версия на фактори</dt><dd>${c.factorVersion ?? '—'}</dd>
           </dl>
         </div>
 
@@ -91,13 +104,33 @@ export class ResultView extends View {
         }
         .metric-card__label { font-size: var(--fs-sm); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .metric-card__value { font-size: var(--fs-2xl); font-weight: var(--fw-bold); margin-top: var(--space-1); }
+        .version-banner {
+          margin-top: var(--space-3);
+          padding: var(--space-3);
+          border-radius: var(--radius-md);
+          display: flex;
+          gap: var(--space-3);
+          align-items: center;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          font-size: var(--fs-sm);
+        }
+        .version-banner--stale {
+          background: color-mix(in srgb, #f57c00 12%, transparent);
+          border: 1px solid color-mix(in srgb, #f57c00 30%, transparent);
+        }
+        .version-banner--recomputed {
+          background: color-mix(in srgb, var(--color-primary, #2e7d32) 10%, transparent);
+          border: 1px solid color-mix(in srgb, var(--color-primary, #2e7d32) 30%, transparent);
+        }
+        .btn--sm { padding: var(--space-1) var(--space-3); font-size: var(--fs-sm); }
       </style>
     `;
   }
 
   protected override onAfterRender(): void {
     if (!this.calc) return;
-    const r = this.calc.result;
+    const r = this.recomputed?.result ?? this.calc.result;
 
     const barHost = this.root.querySelector<HTMLElement>('[data-chart="bar"]');
     if (barHost) {
@@ -140,7 +173,73 @@ export class ResultView extends View {
       this.pieChart.mount(pieHost);
       this.disposers.push(() => this.pieChart?.unmount());
     }
+
+    const recomputeBtn = this.root.querySelector<HTMLButtonElement>('#btn-recompute');
+    recomputeBtn?.addEventListener('click', () => this.recomputeWithLatest());
+    const revertBtn = this.root.querySelector<HTMLButtonElement>('#btn-revert');
+    revertBtn?.addEventListener('click', () => {
+      this.recomputed = null;
+      this.rerender();
+    });
   }
+
+  private isStale(): boolean {
+    if (!this.calc || !this.latestFactor) return false;
+    return (
+      this.calc.factorVersion !== null &&
+      this.calc.factorVersion !== this.latestFactor.version
+    );
+  }
+
+  private versionBannerHTML(
+    showingRecomputed: boolean,
+    usedFactor: RegionFactor | null,
+    stale: boolean,
+  ): string {
+    if (showingRecomputed && usedFactor) {
+      return `
+        <div class="version-banner version-banner--recomputed" role="status">
+          <span>Показани са стойности с актуалните фактори (версия ${escapeHTML(usedFactor.version)} — ${escapeHTML(usedFactor.source)}).</span>
+          <button type="button" id="btn-revert" class="btn btn--ghost btn--sm">Покажи оригинала</button>
+        </div>
+      `;
+    }
+    if (stale && this.latestFactor) {
+      return `
+        <div class="version-banner version-banner--stale" role="status">
+          <span>Налична е по-нова версия на факторите за този регион (${escapeHTML(this.latestFactor.version)}).</span>
+          <button type="button" id="btn-recompute" class="btn btn--secondary btn--sm">Преизчисли с актуални</button>
+        </div>
+      `;
+    }
+    return '';
+  }
+
+  private recomputeWithLatest(): void {
+    if (!this.calc || !this.latestFactor) return;
+    const factor = this.latestFactor;
+    const energyKWh = this.calc.result.energyKWh;
+    const co2eGrams = energyKWh * factor.carbonIntensityGCO2PerKWh;
+    const waterLiters = energyKWh * factor.wueLitersPerKWh;
+    this.recomputed = {
+      factor,
+      result: CalculationResult.of(energyKWh, co2eGrams, waterLiters),
+    };
+    this.rerender();
+  }
+
+  private rerender(): void {
+    for (const dispose of this.disposers) dispose();
+    this.disposers.length = 0;
+    this.root.innerHTML = this.render();
+    this.onAfterRender();
+  }
+}
+
+function escapeHTML(s: string): string {
+  return s.replace(/[&<>"']/g, (c) =>
+    c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '"' ? '&quot;' : '&#39;',
+  );
 }
 
 function normalizedShares(
