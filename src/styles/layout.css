@@ -115,7 +115,20 @@
   top: 0;
   z-index: var(--z-sticky);
 }
+#app.app--auth .app-main {
+  max-width: none;
+  padding: 0;
+  background:
+    radial-gradient(ellipse at top left, color-mix(in srgb, var(--color-co2e) 12%, transparent), transparent 60%),
+    radial-gradient(ellipse at bottom right, color-mix(in srgb, var(--color-water) 10%, transparent), transparent 60%),
+    var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
 #app.app--auth .app-topbar { display: none; }
+#app.app--auth .app-footer { display: none; }
 
 .app-topbar__title { font-size: var(--fs-md); font-weight: var(--fw-semibold); color: var(--color-text); }
 .app-topbar__subtitle { font-size: var(--fs-sm); color: var(--color-text-muted); }
